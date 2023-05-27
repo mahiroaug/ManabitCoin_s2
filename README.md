@@ -1,13 +1,45 @@
-# Sample Hardhat Project
+# ManabitCoin WEB3
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+## 1.compile
+### compile solidity
+```shell
+npx harghat compile
+```
 
-Try running some of the following tasks:
+### update javascript
+`abi.js`
+
+
+### launch local node
+```shell
+npx hardhat node
+```
+
+## 2.deploy contract
+### deploy ManabitCoin (ERC20 token)
+```shell
+npx hardhat run scripts/deploy-ManabitCoin.js
+```
+
+### modify
+`deploy-ManabitGacha.js`
+
+- `const coinContract = "<ManabitCoin Contract Address>"`
+
+### deploy ManabitGacha
+```shell
+npx hardhat run scripts/deploy-ManabitGacha.js
+```
+
+### update javascript
+`contract_address.js`
+
+
+## 3.launch
+### launch WEB3
 
 ```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
+npx http-server ./public/
 ```
+
+- access http://localhost:8080
