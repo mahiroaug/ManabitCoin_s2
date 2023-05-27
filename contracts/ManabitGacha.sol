@@ -5,24 +5,20 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract ManabitGacha {
 
-    // data structure
-    struct Manabit {
-        uint id;
-        address sender;
-        address receiver;
-        string comment;
-        uint256 amount;
-    }
-
-    // table
-    Manabit[] public ManabitList;
-
     // ManabitCoin
     IERC20 public ManabitCoin;
 
+    // Manabit event definition
+    event Manabit(
+        address indexed sender,
+        address indexed receiver,
+        uint256 amount,
+        string comment
+    );
+
     // initializer
-    constructor(address ManabitAddress) {
-        ManabitCoin = IERC20(ManabitAddress);
+    constructor(address ManabitCoinContractAddress) {
+        ManabitCoin = IERC20(ManabitCoinContractAddress);
     }
 
     // sendManabitCoin non-payable
@@ -44,26 +40,10 @@ contract ManabitGacha {
             // send
             ManabitCoin.transferFrom(msg.sender, to, amount);
 
-            // regist in List
-            Manabit memory manabit = Manabit(
-                ManabitList.length,
-                msg.sender,
-                to,
-                comment,
-                amount
-            );
-            ManabitList.push(manabit);
+            // event trigger
+            emit Manabit(msg.sender, to, amount, comment);
 
             return true;
         }
 
-    // sentManabitList view
-    function sentManabitList(address sender) public view returns (Manabit[] memory) {
-        //TODO
-    }
-
-    // receivedManabitList view
-    function receivedManabitList(address receiver) public view returns (Manabit[] memory) {
-        //TODO
-    }
 }

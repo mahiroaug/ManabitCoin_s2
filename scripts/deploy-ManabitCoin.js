@@ -6,21 +6,19 @@
 // global scope, and execute the script.
 const hre = require("hardhat");
 
+const contractName = "ManabitCoin";
+
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
+  const Contract = await hre.ethers.getContractFactory(contractName);
+  const contract = await Contract.deploy();
+  const ethAmount = 0;
 
-  const lockedAmount = hre.ethers.utils.parseEther("0.001");
-
-  const Lock = await hre.ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
-
-  await lock.deployed();
+  await contract.deployed();
 
   console.log(
-    `Lock with ${ethers.utils.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
+    `Contract with ${ethers.utils.formatEther(
+      ethAmount
+    )}ETH and deployed to ${contract.address}`
   );
 }
 
