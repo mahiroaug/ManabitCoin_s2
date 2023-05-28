@@ -3,7 +3,7 @@
 ## 1.compile
 ### compile solidity
 ```shell
-npx harghat compile
+npx hardhat compile
 ```
 
 ### update javascript
@@ -18,7 +18,7 @@ npx hardhat node
 ## 2.deploy contract
 ### deploy ManabitCoin (ERC20 token)
 ```shell
-npx hardhat run scripts/deploy-ManabitCoin.js
+npx hardhat run scripts/deploy-ManabitCoin.js --network localhost
 ```
 
 ### modify
@@ -28,7 +28,7 @@ npx hardhat run scripts/deploy-ManabitCoin.js
 
 ### deploy ManabitGacha
 ```shell
-npx hardhat run scripts/deploy-ManabitGacha.js
+npx hardhat run scripts/deploy-ManabitGacha.js --network localhost
 ```
 
 ### update javascript
