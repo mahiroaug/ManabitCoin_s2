@@ -34,8 +34,8 @@ contract ManabitGacha {
             // Must Step
             require(to != address(0), "ManabitGacha: send to zero address");
             require(amount > 0, "ManabitGacha: Amount must be greater than 0");
-            require(balance >= amount, "ManabitGacha: Transfer amount exceeds MHR balance");
-            require(allowance >= amount, "ManabitGacha: Insufficient MHR allowance");
+            require(balance >= amount, "ManabitGacha: Transfer amount exceeds MNBC balance");
+            require(allowance >= amount, "ManabitGacha: Insufficient MNBC allowance");
             
             // send
             ManabitCoin.transferFrom(msg.sender, to, amount);
