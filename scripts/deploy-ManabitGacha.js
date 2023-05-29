@@ -6,8 +6,10 @@
 // global scope, and execute the script.
 const hre = require("hardhat");
 
+require('dotenv').config({ path: 'ca.env'});
+
 const contractName = "ManabitGacha";
-const coinContract = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+const coinContract = process.env.MNBC_COIN_CA;
 
 async function main() {
   const Contract = await hre.ethers.getContractFactory(contractName);

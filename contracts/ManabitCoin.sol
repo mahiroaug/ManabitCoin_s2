@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ManabitCoin is ERC20, Ownable {
-    constructor() ERC20("ManabitCoin", "MHR") {
+    constructor() ERC20("ManabitCoin", "MNBC") {
         _mint(msg.sender, 1000000 * 10 ** decimals());
     }
 
