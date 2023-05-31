@@ -61,3 +61,34 @@ npx http-server ./public/
 ```
 
 - access http://localhost:8080
+
+
+## 5.AWS Managed Blockchain
+### add .env
+```
+## HardHat local node
+#OWNER_PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+#OWNER_ADDRESS=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+#COMMON_ADDRESS=0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+
+
+## Goerli - ManabitCoin
+SIGNER_PRIVATE_KEY=
+OWNER_PRIVATE_KEY=
+OWNER_ADDRESS=
+COMMON_ADDRESS=
+
+
+AWS_DEFAULT_REGION=ap-northeast-1
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+
+
+AMB_NODE_ID=
+AMB_ACCESSOR_TOKEN=
+AMB_HTTP_ENDPOINT=
+AMB_WS_ENDPOINT=
+
+
+```
+
