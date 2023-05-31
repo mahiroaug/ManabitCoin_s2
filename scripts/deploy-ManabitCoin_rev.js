@@ -4,9 +4,10 @@
 // You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
 // will compile your contracts, add the Hardhat Runtime Environment's members to the
 // global scope, and execute the script.
+require('dotenv').config({ path: '.env_localhost'});
+
 const hre = require("hardhat");
 
-//const contractName = "ManabitCoin";
 const privateKey = process.env.OWNER_PRIVATE_KEY;
 const account = web3.eth.accounts.privateKeyToAccount(privateKey);
 
@@ -17,7 +18,6 @@ async function main() {
   
   const Contract = await hre.ethers.getContractFactory(name);
   const contract = await Contract.deploy(name, symbol, initialSupply, account.address);
-  //const contract = await Contract.deploy();
 
   const ethAmount = 0;
 
