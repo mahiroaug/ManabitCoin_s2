@@ -5,8 +5,16 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ManabitCoin is ERC20, Ownable {
-    constructor() ERC20("ManabitCoin", "MNBC") {
-        _mint(msg.sender, 1000000 * 10 ** decimals());
+    address public OWNER;
+
+    constructor(
+        string memory name,
+        string memory symbol,
+        uint256 initialSupply,
+        address payable owner
+    ) payable ERC20(name, symbol) {
+        OWNER = owner;
+        _mint(OWNER, initialSupply);
     }
 
     function mint(address to, uint256 amount) public onlyOwner {

@@ -11,7 +11,7 @@ const web3 = new Web3('http://localhost:8545');
 
 const Coin = new web3.eth.Contract(COIN_ABI, COIN_CA);
 const Gacha = new web3.eth.Contract(GACHA_ABI, GACHA_CA);
-const signer = web3.eth.accounts.privateKeyToAccount(process.env.SIGNER_PRIVATE_KEY);
+const signer = web3.eth.accounts.privateKeyToAccount(process.env.OWNER_PRIVATE_KEY);
 
 
 let owner;
