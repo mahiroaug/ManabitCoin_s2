@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.0",
-    "aws-sdk": "^2.1387.0",
+    "aws-sdk": "^2.1388.0",
     "dotenv": "^16.0.3",
     "xhr2": "^0.2.1"
   }

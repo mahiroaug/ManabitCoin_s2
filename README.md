@@ -74,6 +74,9 @@ npx http-server ./public/
 
 ### .env
 ```
+NETWORK=goerli
+
+
 ## Goerli - ManabitCoin
 SIGNER_PRIVATE_KEY=
 OWNER_PRIVATE_KEY=
