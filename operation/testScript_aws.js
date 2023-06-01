@@ -50,7 +50,7 @@ async function main() {
         await manabitCC.sendManabit(process.env.MY_TEST_ADDRESS,15,"2023/06/01_17:00|15 Star|mats");
 
         console.log("---step4b--------getOwnerBalance-------------------------");
-        await manabitCC.getOwnerBalance();
+        //await manabitCC.getOwnerBalance();
 
         console.log("---step4c--------getAccountBalance(TEST Wallet)-------------");
         await manabitCC.getAccountBalance(process.env.MY_TEST_ADDRESS);
