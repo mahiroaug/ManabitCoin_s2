@@ -5,7 +5,7 @@
         "type": "node",
         "request": "launch",
         "name": "Launch Node.js",
-        "program": "${workspaceFolder}/operation/aws-web3-manabit.js",
+        "program": "${workspaceFolder}/operation/testScript_aws.js",
         "cwd": "${workspaceFolder}",
         "runtimeExecutable": "node",
         "env": {
