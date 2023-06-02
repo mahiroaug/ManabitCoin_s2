@@ -116,3 +116,13 @@ Deployment ManabitGacha
 npx hardhat run --network amb scripts/deploy-amb-ManabitGacha.js
 ```
 
+### AWS Lambda Function
+
+create layer file
+
+```
+cd aws-lambda-layer
+zip -r nodejs_layer.zip nodejs
+```
+
+

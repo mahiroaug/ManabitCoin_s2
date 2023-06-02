@@ -1,42 +1,83 @@
-require('dotenv').config({ path: '.env'});
-require('dotenv').config({ path: 'ca.env'});
+'use strict'
 
 // suppress message while AWS-SDK v2
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 
-const network = process.env.NETWORK;
 
+const SecretsManager = require('lib/secretsManager.js');
 const Web3 = require('web3');
-const AWSHttpProvider = require('./aws-http-provider.js');
-const endpoint = process.env.AMB_HTTP_ENDPOINT;
-const web3 = new Web3(new AWSHttpProvider(endpoint));
-const owner = web3.eth.accounts.privateKeyToAccount(process.env.OWNER_PRIVATE_KEY);
+//const AWSHttpProvider = require('lib/aws-http-provider.js');
+const AWSHttpProvider = require('@aws/web3-http-provider');
 
-const signer = owner;
-web3.eth.accounts.wallet.add(signer);
+let network;
+let web3;
+let owner;
+let signer;
 
-const COIN_CA = process.env.MNBC_COIN_CA;
-const GACHA_CA = process.env.MNBC_GACHA_CA;
-const COIN_ABI = require('../artifacts/contracts/ManabitCoin.sol/ManabitCoin.json').abi;
-const GACHA_ABI = require('../artifacts/contracts/ManabitGacha.sol/ManabitGacha.json').abi;
+let COIN_CA;
+let GACHA_CA;
+let COIN_ABI;
+let GACHA_ABI;
+let Coin;
+let Gacha;
 
-const Coin = new web3.eth.Contract(COIN_ABI, COIN_CA, { from: signer.address });
-const Gacha = new web3.eth.Contract(GACHA_ABI, GACHA_CA, { from: signer.address });
+let secrets;
 
+////// initializer ////////////
+
+async function init_ENV() {
+    try{
+        const secretName = 'web3-manaBit-ssm';
+        const region = 'ap-northeast-1';
+        const secretsString = await SecretsManager.getSecret(secretName, region);
+        secrets = JSON.parse(secretsString);
+
+        // web3
+        network = secrets.NETWORK;
+        const endpoint = secrets.AMB_HTTP_ENDPOINT;
+
+        web3 = new Web3(new AWSHttpProvider(endpoint));
+        owner = web3.eth.accounts.privateKeyToAccount(secrets.OWNER_PRIVATE_KEY);
+        signer = owner;
+        web3.eth.accounts.wallet.add(signer);
+
+        // contract
+        COIN_CA = secrets.MNBC_COIN_CA;
+        COIN_ABI = require('lib/contracts/ManabitCoin.sol/ManabitCoin.json').abi;
+        Coin = new web3.eth.Contract(COIN_ABI, COIN_CA, { from: signer.address });
+        GACHA_CA = secrets.MNBC_GACHA_CA;
+        GACHA_ABI = require('lib/contracts/ManabitGacha.sol/ManabitGacha.json').abi;
+        Gacha = new web3.eth.Contract(GACHA_ABI, GACHA_CA, { from: signer.address });
+
+    } catch(error){
+        console.error("Error init_ENV: ", error);
+    }
+}
 
 
 ////// call functions /////////
 
 async function getOwnerBalance() {
-    console.log(`Owner: ${owner.address}`);
+    await init_ENV();
+
+    await console.log(`Owner address: ${owner.address}`);
+    ///await console.log(`AMB HTTP: ${secrets.AMB_HTTP_ENDPOINT}`);
 
     // ETH Balance
-    const balance = await web3.eth.getBalance(owner.address);
-    console.log(`ETH Balance : ${web3.utils.fromWei(balance, 'ether')} ETH`);
+    const balanceWei = await web3.eth.getBalance(owner.address);
+    const balanceETH = await web3.utils.fromWei(balanceWei, 'ether')
+    await console.log(`ETH Balance : ${balanceETH} ETH`);
 
     // MNBC Balance
-    const mnbcBalance = await Coin.methods.balanceOf(owner.address).call();
-    console.log(`MNBC Balance: ${web3.utils.fromWei(mnbcBalance, 'ether')} MNBC`);
+    const balanceMNBC = await Coin.methods.balanceOf(owner.address).call();
+    await console.log(`MNBC Balance: ${web3.utils.fromWei(balanceMNBC, 'ether')} MNBC`);
+
+    return {
+        ownerAddress: owner.address,
+        ownerBalanceWei: balanceWei,
+        ownerBalanceETH: balanceETH,
+        ownerBalanceMNBC: balanceMNBC
+    }
 }
 
 async function getAccountBalance(address) {
@@ -67,7 +108,7 @@ async function getAllowance(spender){
 const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
 
     // check toAddress
-    toAddress = web3.utils.toChecksumAddress(_to);
+    const toAddress = web3.utils.toChecksumAddress(_to);
     console.log(' toAddress:',toAddress);
 
     // gasLimit

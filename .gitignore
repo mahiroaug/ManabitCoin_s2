@@ -144,3 +144,7 @@ typechain-types
 cache
 artifacts
 
+# AWS lambda layer file
+nodejs_layer.zip
+lambda_func.zip
+
