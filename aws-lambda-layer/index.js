@@ -27,6 +27,10 @@ exports.handler = async (event, context) => {
             output = await _approveGacha(event);
             break;
 
+        case 'transferMNBC':
+            output = await _transferMNBC(event);
+            break;
+
         case 'sendManabit':
             output = await _sendManabit(event);
             break;
@@ -35,20 +39,13 @@ exports.handler = async (event, context) => {
 
 
     const response = {
-
-        title: 'Hello, world',
-        output: output,
         event: event, // 呼び出し元からの情報
         context: context, // コンテキスト情報
-
-        // Amazon API Gatewayを利用してLambda関数をWebAPI化するときは
-        // 必要に応じisBase64Encoded,statusCode,headers,bodyをセット
         statusCode: 200,
         headers: {
             'x-custom-header': 'custom header value'
         },
         body: JSON.stringify({
-            title: 'Hello, world',
             output: output,
         })
     };
@@ -60,28 +57,29 @@ exports.handler = async (event, context) => {
 /////////////////// GET(Call) Funtion /////////////////////
 
 
-// オーナーの残高を取得
+// オーナーの残高を取得 ***未完成***
 async function _getOwnerBalance (event) {
-    const result = await manabitCC.getOwnerBalance();
-    return result;
+    // Ownerアドレスを取得
+
+    return
+    //const result = await manabitCC.getAccountBalance(address);
+    //return result;
 }
 
 
 // 指定アドレスの残高を取得
 async function _getAccountBalance (event) {
-    // address健全性を確認する処理
-
-
+    // address
+    const address = event.param.to_address;
     const result = await manabitCC.getAccountBalance(address);
     return result;
 }
 
 // 指定アドレスのallowanceを取得
 async function _getAllowance (event) {
-    // address健全性を確認する処理
-
-
-    const result = await manabitCC.getAllowance(to_address);
+    // address
+    const address = event.param.to_address;
+    const result = await manabitCC.getAllowance(address);
     return result;
 }
 
@@ -92,18 +90,43 @@ async function _getAllowance (event) {
 // GACHAコントラクトに指定量(MNBC)をApprove
 async function _approveGacha (event) {
     // 指定量(MNBC)チェック
+    const amount = event.param.amount;
 
+    if(amount > 1000){
+        return
+    }
 
     const result = await manabitCC.approveGacha(amount);
     return result;
 }
 
+
+// MNBC転送 ****未完成
+async function _transferMNBC(event) {
+    // TO DO
+
+
+    return
+}
+
+
+
+
 // manabit送信
 async function _sendManabit (event) {
     // to_address,指定量(MNBC),コメントをチェック
+    const address = event.param.to_address;
+    const amount = event.param.amount;
+    const comment = event.param.comment;
 
+    // MNBC上限判定
+    if(amount > 100){
+        return
+    }
 
-    const result = await manabitCC.sendManabit(to_address, amount, comment);
+    // 
+
+    const result = await manabitCC.sendManabit(address, amount, comment);
     return result;
 }
 

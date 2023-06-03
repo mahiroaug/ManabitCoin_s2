@@ -57,46 +57,46 @@ async function init_ENV() {
 
 ////// call functions /////////
 
-async function getOwnerBalance() {
+async function getAccountBalance(address) {
     await init_ENV();
 
-    await console.log(`Owner address: ${owner.address}`);
-    ///await console.log(`AMB HTTP: ${secrets.AMB_HTTP_ENDPOINT}`);
+    console.log(`Account: ${address}`);
+    try{
+        // ETH Balance
+        const balanceWei = await web3.eth.getBalance(address);
+        const balanceETH = await web3.utils.fromWei(balanceWei, 'ether');
+        console.log(`ETH Balance : ${balanceETH} ETH`);
 
-    // ETH Balance
-    const balanceWei = await web3.eth.getBalance(owner.address);
-    const balanceETH = await web3.utils.fromWei(balanceWei, 'ether')
-    await console.log(`ETH Balance : ${balanceETH} ETH`);
+        // MNBC Balance
+        const balanceMNBCw = await Coin.methods.balanceOf(address).call();
+        const balanceMNBC = await web3.utils.fromWei(balanceMNBCw, 'ether');
+        console.log(`MNBC Balance: ${balanceMNBC} MNBC`);
 
-    // MNBC Balance
-    const balanceMNBC = await Coin.methods.balanceOf(owner.address).call();
-    await console.log(`MNBC Balance: ${web3.utils.fromWei(balanceMNBC, 'ether')} MNBC`);
-
-    return {
-        ownerAddress: owner.address,
-        ownerBalanceWei: balanceWei,
-        ownerBalanceETH: balanceETH,
-        ownerBalanceMNBC: balanceMNBC
+        return {
+            Address: address,
+            BalanceWei: balanceWei,
+            BalanceETH: balanceETH,
+            BalanceMNBC: balanceMNBC
+        }
+        
+    } catch(error){
+        console.error("Error getAccountBalance: ", error);
     }
 }
 
-async function getAccountBalance(address) {
-    console.log(`Account: ${address}`);
+async function getAllowance(spender_address){
+    await init_ENV();
 
-    // ETH Balance
-    const balance = await web3.eth.getBalance(address);
-    console.log(`ETH Balance : ${web3.utils.fromWei(balance, 'ether')} ETH`);
-
-    // MNBC Balance
-    const mnbcBalance = await Coin.methods.balanceOf(address).call();
-    console.log(`MNBC Balance: ${web3.utils.fromWei(mnbcBalance, 'ether')} MNBC`);
-}
-
-async function getAllowance(spender){
+    console.log(`spender Account: ${spender_address}`);
     try{
-        const allowance = await Coin.methods.allowance(signer.address,spender).call();
-        const mnbcAllowance = web3.utils.fromWei(allowance.toString(),"ether");
-        console.log('Allowance: ',mnbcAllowance);
+        const allowance = await Coin.methods.allowance(signer.address,spender_address).call();
+        const allowanceMNBC = await web3.utils.fromWei(allowance.toString(),"ether");
+        console.log('Allowance: ',allowanceMNBC);
+
+        return {
+            Address: spender_address,
+            Allowance: allowanceMNBC
+        }
 
     } catch(error){
         console.error("Error getAllowance: ", error);
@@ -161,12 +161,57 @@ const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
 
 // Gachaコントラクトに対して必要量のMNBCトークン使用許可を与える
 async function approveGacha(amount){
+    await init_ENV();
+
+    console.log(`Approve amount to GACHA_CA: ${amount} MNBC`);
     try{
         const weiAmount = await web3.utils.toWei(amount.toString(),"ether");
         const tx = await Coin.methods.approve(GACHA_CA, weiAmount);
         const receipt = await sendTx(COIN_CA,tx,owner,150000);
+        console.log(('receipt:',receipt));
 
-        console.log((`approve ${amount} MNBC to GACHA_CA: ${GACHA_CA}`));
+        const txhash = receipt.transactionHash;
+        const etherscan = `https://${network}.etherscan.io/tx/${txhash}`;
+
+        return {
+            tx_receipt : receipt,
+            transactionHash : txhash,
+            sender_address : receipt.from,
+            receiver_address : receipt.to,
+            gasUsed : receipt.gasUsed,
+            gasPrice : receipt.effectiveGasPrice,
+            etherscan : etherscan
+        }
+        
+    } catch(error){
+        console.error('Error:', error);
+    }
+}
+
+// 未完成（動作未確認）
+async function transferMNBC(to_address, amount){
+    await init_ENV();
+
+    console.log((`transfer ${amount} MNBC to ${to_address}`));
+
+    try{
+        const weiAmount = web3.utils.toWei(amount.toString(),"ether");
+        const tx = Coin.methods.transfer(to_address, weiAmount);
+        const receipt = await sendTx(COIN_CA,tx,owner,150000);
+        console.log(('receipt:',receipt));
+
+        const txhash = receipt.transactionHash;
+        const etherscan = `https://${network}.etherscan.io/tx/${txhash}`;
+
+        return {
+            tx_receipt : receipt,
+            transactionHash : txhash,
+            sender_address : receipt.from,
+            receiver_address : receipt.to,
+            gasUsed : receipt.gasUsed,
+            gasPrice : receipt.effectiveGasPrice,
+            etherscan : etherscan
+        }
         
     } catch(error){
         console.error('Error:', error);
@@ -174,35 +219,37 @@ async function approveGacha(amount){
 }
 
 
-async function transferMNBC(to_address, amount){
+async function sendManabit(to, amount, comment){
+    await init_ENV();
+
+    console.log((`send Manabit ${amount} MNBC to ${to} with comment "${comment}"`));
+
     try{
         const weiAmount = web3.utils.toWei(amount.toString(),"ether");
-        const tx = Coin.methods.transfer(to_address, weiAmount);
-        const receipt = await sendTx(COIN_CA,tx,owner,150000);
+        const tx = Gacha.methods.sendManabitCoin(comment, to, weiAmount);
+        const receipt = await sendTx(GACHA_CA,tx,owner,300000);
+        console.log(('receipt:',receipt));
 
-        console.log((`transferred ${amount} MNBC to ${to_address}`));
+        const txhash = receipt.transactionHash;
+        const etherscan = `https://${network}.etherscan.io/tx/${txhash}`;
 
+        return {
+            tx_receipt : receipt,
+            transactionHash : txhash,
+            sender_address : receipt.from,
+            receiver_address : receipt.to,
+            gasUsed : receipt.gasUsed,
+            gasPrice : receipt.effectiveGasPrice,
+            etherscan : etherscan
+        }
+        
     } catch(error){
         console.error('Error:', error);
     }
 }
 
-async function sendManabit(to, amount, comment){
-    try{
-        const weiAmount = web3.utils.toWei(amount.toString(),"ether");
-        const tx = Gacha.methods.sendManabitCoin(comment, to, weiAmount);
-        const receipt = await sendTx(GACHA_CA,tx,owner,300000);
-
-        console.log((`send Manabit ${amount} MNBC to ${to} with comment "${comment}"`));
-
-    } catch(error){
-        console.error("Error sending Manabit:", error);
-    }
-}
-
 
 module.exports = {
-    getOwnerBalance,
     getAccountBalance,
     getAllowance,
     approveGacha,
