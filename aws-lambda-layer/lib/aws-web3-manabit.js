@@ -1,11 +1,11 @@
 'use strict'
 
 // suppress message while AWS-SDK v2
-require('aws-sdk/lib/maintenance_mode_message').suppress = true;
-
+//require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 
 const SecretsManager = require('lib/secretsManager.js');
 const Web3 = require('web3');
+
 //const AWSHttpProvider = require('lib/aws-http-provider.js');
 const AWSHttpProvider = require('@aws/web3-http-provider');
 
@@ -126,7 +126,7 @@ const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
 
     // gasPrice
     const gasPrice = await web3.eth.getGasPrice();
-    const gasPriceInGwei = await web3.utils.fromWei(gasPrice, 'gwei');
+    const gasPriceInGwei = await web3.utils.fromWei(gasPrice.toString(), 'gwei');
     console.log(' gasPrice:', gasPrice,'(', gasPriceInGwei,'Gwei)');
 
     // estimate max Transaction Fee
@@ -154,7 +154,36 @@ const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
 
         })
     console.log(` Tx successful with hash: ${createReceipt.transactionHash} in block ${createReceipt.blockNumber}`);
-    return(createReceipt);
+    console.log('createReceipt: ',createReceipt)
+
+    // result 
+    const etherscan = `https://${network}.etherscan.io/tx/${createReceipt.transactionHash}`;
+
+    const effectiveGasPriceGwei = await web3.utils.fromWei(createReceipt.effectiveGasPrice.toString(), 'gwei');
+    const effectiveGasPrice_str = createReceipt.effectiveGasPrice + ' wei (' + effectiveGasPriceGwei + ' Gwei)'
+    console.log('',effectiveGasPrice_str);
+
+    const effectiveTxFee = createReceipt.gasUsed * createReceipt.effectiveGasPrice;
+    const effectiveTxFeeGwei = await web3.utils.fromWei(effectiveTxFee.toString(), 'gwei');
+    const effectiveTxFeeETH = await web3.utils.fromWei(effectiveTxFee.toString(), 'ether');
+    const effectiveTxFee_str = effectiveTxFee +  ' wei (' + effectiveTxFeeGwei + ' Gwei) (' + effectiveTxFeeETH + ' ETH)'
+    console.log(' ',effectiveTxFee_str);
+
+
+    return {
+        tx_receipt : createReceipt,
+        transactionHash : createReceipt.transactionHash,
+        sender_address : createReceipt.from,
+        receiver_address : createReceipt.to,
+        gasUsed : createReceipt.gasUsed,
+        gasPrice : createReceipt.effectiveGasPrice,
+        gasPriceGwei : effectiveGasPriceGwei,
+        gasPriceString : effectiveGasPrice_str,
+        txFeeETH : effectiveTxFeeETH,
+        txFeeString : effectiveTxFee_str,
+        etherscan : etherscan
+    }
+
 };
 
 
@@ -169,20 +198,9 @@ async function approveGacha(amount){
         const tx = await Coin.methods.approve(GACHA_CA, weiAmount);
         const receipt = await sendTx(COIN_CA,tx,owner,150000);
         console.log(('receipt:',receipt));
-
-        const txhash = receipt.transactionHash;
-        const etherscan = `https://${network}.etherscan.io/tx/${txhash}`;
-
         return {
-            tx_receipt : receipt,
-            transactionHash : txhash,
-            sender_address : receipt.from,
-            receiver_address : receipt.to,
-            gasUsed : receipt.gasUsed,
-            gasPrice : receipt.effectiveGasPrice,
-            etherscan : etherscan
+            receipt
         }
-        
     } catch(error){
         console.error('Error:', error);
     }
@@ -195,24 +213,13 @@ async function transferMNBC(to_address, amount){
     console.log((`transfer ${amount} MNBC to ${to_address}`));
 
     try{
-        const weiAmount = web3.utils.toWei(amount.toString(),"ether");
-        const tx = Coin.methods.transfer(to_address, weiAmount);
+        const weiAmount = await web3.utils.toWei(amount.toString(),"ether");
+        const tx = await Coin.methods.transfer(to_address, weiAmount);
         const receipt = await sendTx(COIN_CA,tx,owner,150000);
         console.log(('receipt:',receipt));
-
-        const txhash = receipt.transactionHash;
-        const etherscan = `https://${network}.etherscan.io/tx/${txhash}`;
-
         return {
-            tx_receipt : receipt,
-            transactionHash : txhash,
-            sender_address : receipt.from,
-            receiver_address : receipt.to,
-            gasUsed : receipt.gasUsed,
-            gasPrice : receipt.effectiveGasPrice,
-            etherscan : etherscan
+            receipt
         }
-        
     } catch(error){
         console.error('Error:', error);
     }
@@ -225,24 +232,13 @@ async function sendManabit(to, amount, comment){
     console.log((`send Manabit ${amount} MNBC to ${to} with comment "${comment}"`));
 
     try{
-        const weiAmount = web3.utils.toWei(amount.toString(),"ether");
-        const tx = Gacha.methods.sendManabitCoin(comment, to, weiAmount);
+        const weiAmount = await web3.utils.toWei(amount.toString(),"ether");
+        const tx = await Gacha.methods.sendManabitCoin(comment, to, weiAmount);
         const receipt = await sendTx(GACHA_CA,tx,owner,300000);
         console.log(('receipt:',receipt));
-
-        const txhash = receipt.transactionHash;
-        const etherscan = `https://${network}.etherscan.io/tx/${txhash}`;
-
         return {
-            tx_receipt : receipt,
-            transactionHash : txhash,
-            sender_address : receipt.from,
-            receiver_address : receipt.to,
-            gasUsed : receipt.gasUsed,
-            gasPrice : receipt.effectiveGasPrice,
-            etherscan : etherscan
+            receipt
         }
-        
     } catch(error){
         console.error('Error:', error);
     }

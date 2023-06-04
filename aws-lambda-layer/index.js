@@ -93,6 +93,7 @@ async function _approveGacha (event) {
     const amount = event.param.amount;
 
     if(amount > 1000){
+        console.error('the approve amount exceeds the upper limit')
         return
     }
 
@@ -104,8 +105,6 @@ async function _approveGacha (event) {
 // MNBC転送 ****未完成
 async function _transferMNBC(event) {
     // TO DO
-
-
     return
 }
 
@@ -119,15 +118,12 @@ async function _sendManabit (event) {
     const amount = event.param.amount;
     const comment = event.param.comment;
 
-    // MNBC上限判定
-    if(amount > 100){
-        return
+    // MNBC指定上限
+    if(amount > 30){
+        console.log('change the amount to the upper limit from ',amount)
+        amount = 30
     }
-
-    // 
 
     const result = await manabitCC.sendManabit(address, amount, comment);
     return result;
 }
-
-
