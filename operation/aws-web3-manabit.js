@@ -73,10 +73,10 @@ const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
     // gasLimit
     /* ****** existing bug : ERC20: approce from the zero address
     const estimateGas = await web3.eth.estimateGas(
-      {
+    {
         to: _to,
         data: _tx.encodeABI()
-      });
+    });
     const setGasLimit = estimateGas+10000;
     console.log('gas(estimated):', estimateGas, 'gasLimit:', setgGasLimit);
     */
@@ -96,14 +96,14 @@ const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
 
     // Sign Tx
     const createTransaction = await web3.eth.accounts.signTransaction(
-      {
-        to: toAddress,
-        data: _tx.encodeABI(),
-        gas: await web3.utils.toHex(_gasLimit)
-      },
-      _signer.privateKey
+        {
+            to: toAddress,
+            data: _tx.encodeABI(),
+            gas: await web3.utils.toHex(_gasLimit)
+        },
+        _signer.privateKey
     );
-  
+
     // Send Tx and Wait for Receipt
     const createReceipt = await web3.eth
         .sendSignedTransaction(createTransaction.rawTransaction)
@@ -126,7 +126,7 @@ async function approveGacha(amount){
         const receipt = await sendTx(COIN_CA,tx,owner,150000);
 
         console.log((`approve ${amount} MNBC to GACHA_CA: ${GACHA_CA}`));
-
+        
     } catch(error){
         console.error('Error:', error);
     }
