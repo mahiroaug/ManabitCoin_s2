@@ -13,6 +13,7 @@ const { inspect } = require('util');
 const Web3 = require("web3");
 const { FireblocksWeb3Provider, ChainId } = require("@fireblocks/fireblocks-web3-provider")
 const AWSHttpProvider = require('@aws/web3-http-provider');
+const { toASCII } = require('punycode');
 
 //// common environment
 const COIN_CA = process.env.MNBC_COIN_CA;
@@ -92,7 +93,7 @@ const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
     const estimateMaxTxFeeETH = await web3aws.utils.fromWei(estimateMaxTxFee.toString(), 'ether');
     console.log(' estimate MAX Tx Fee:', estimateMaxTxFee, '(', estimateMaxTxFeeETH, 'ETH)');
 
-
+/*
     // Sign Tx
     const createTransaction = await web3FB.eth.signTransaction(
         {
@@ -112,8 +113,25 @@ const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
 
         })
     console.log(` Tx successful with hash: ${createReceipt.transactionHash} in block ${createReceipt.blockNumber}`);
+*/
+
+
+    const createReceipt = await web3FB.eth.sendTransaction({
+        to: toAddress,
+        from: _signer,
+        data: _tx.encodeABI(),
+        gas: await web3FB.utils.toHex(setGasLimit)
+    }).once("transactionHash", (txhash) => {
+        console.log(` Send transaction ...`);
+        console.log(` https://${network}.etherscan.io/tx/${txhash}`);
+    })
+    console.log(` Tx successful with hash: ${createReceipt.transactionHash} in block ${createReceipt.blockNumber}`);
+
+
+
     return(createReceipt);
-};
+}
+
 
 // Gachaコントラクトに対して必要量のMNBCトークン使用許可を与える
 async function approveGacha(amount){
