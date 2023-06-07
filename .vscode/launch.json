@@ -5,7 +5,7 @@
         "type": "node",
         "request": "launch",
         "name": "Launch Node.js",
-        "program": "${workspaceFolder}/operation/testScript_aws.js",
+        "program": "${workspaceFolder}/testScript_03aws-fireblocks/testScript_fireblocks_web3provider.js",
         "cwd": "${workspaceFolder}",
         "runtimeExecutable": "node",
         "env": {

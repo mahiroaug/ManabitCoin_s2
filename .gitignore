@@ -148,3 +148,5 @@ artifacts
 nodejs_layer.zip
 lambda_func.zip
 
+# fireblocks secret key
+*.key
