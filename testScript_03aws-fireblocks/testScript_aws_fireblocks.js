@@ -16,6 +16,7 @@ const AWSHttpProvider = require('@aws/web3-http-provider');
 const { toASCII } = require('punycode');
 
 //// common environment
+const network = process.env.NETWORK;
 const COIN_CA = process.env.MNBC_COIN_CA;
 const GACHA_CA = process.env.MNBC_GACHA_CA;
 const COIN_ABI = require('../artifacts/contracts/ManabitCoin.sol/ManabitCoin.json').abi;
@@ -134,11 +135,11 @@ const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
 
 
 // Gachaコントラクトに対して必要量のMNBCトークン使用許可を与える
-async function approveGacha(amount){
+async function approveGacha(signerAddr,amount){
     try{
         const weiAmount = await web3aws.utils.toWei(amount.toString(),"ether");
         const tx = await CoinFB.methods.approve(GACHA_CA, weiAmount);
-        const receipt = await sendTx(COIN_CA,tx,signer_addressFB,150000);
+        const receipt = await sendTx(COIN_CA,tx,signerAddr,150000);
 
         console.log((`approve ${amount} MNBC to GACHA_CA: ${GACHA_CA}`));
         
@@ -146,6 +147,22 @@ async function approveGacha(amount){
         console.error('Error:', error);
     }
 }
+
+async function sendManabit(signerAddr, to, amount, comment){
+    try{
+        const weiAmount = web3aws.utils.toWei(amount.toString(),"ether");
+        const tx = GachaFB.methods.sendManabitCoin(comment, to, weiAmount);
+        const receipt = await sendTx(GACHA_CA,tx,signerAddr,300000);
+
+        console.log((`send Manabit ${amount} MNBC to ${to} with comment "${comment}"`));
+
+    } catch(error){
+        console.error("Error sending Manabit:", error);
+    }
+}
+
+
+
 
 (async() => {
   
@@ -178,11 +195,23 @@ async function approveGacha(amount){
 
 
     // approveGacha
-    await approveGacha(500)
+    ////await approveGacha(signer_addressFB,500)
+
+
+    // get Allowance
+    ////await getAllowance(signer_addressFB,GACHA_CA);
+
+
+    // send Manabit
+    await sendManabit(signer_addressFB,test_addr,1,"2023/06/08_17:00|testScript");
 
 
     // get Allowance
     await getAllowance(signer_addressFB,GACHA_CA);
+
+    // get Balance
+    await getAccountBalance(signer_addressFB);
+
 
 
 })().catch(error => {
