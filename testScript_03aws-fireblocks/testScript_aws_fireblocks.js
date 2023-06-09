@@ -148,6 +148,7 @@ async function approveGacha(signerAddr,amount){
     }
 }
 
+// まなびっと送信
 async function sendManabit(signerAddr, to, amount, comment){
     try{
         const weiAmount = web3aws.utils.toWei(amount.toString(),"ether");
@@ -195,15 +196,15 @@ async function sendManabit(signerAddr, to, amount, comment){
 
 
     // approveGacha
-    ////await approveGacha(signer_addressFB,500)
+    //await approveGacha(signer_addressFB,500)
 
 
     // get Allowance
-    ////await getAllowance(signer_addressFB,GACHA_CA);
+    await getAllowance(signer_addressFB,GACHA_CA);
 
 
     // send Manabit
-    await sendManabit(signer_addressFB,test_addr,1,"2023/06/08_17:00|testScript");
+    //await sendManabit(signer_addressFB,test_addr,1,"2023/06/08_17:01|testScript");
 
 
     // get Allowance
