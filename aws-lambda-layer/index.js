@@ -45,9 +45,7 @@ exports.handler = async (event, context) => {
         headers: {
             'x-custom-header': 'custom header value'
         },
-        body: JSON.stringify({
-            output: output,
-        })
+        body: JSON.stringify(output)
     };
 
     return response;

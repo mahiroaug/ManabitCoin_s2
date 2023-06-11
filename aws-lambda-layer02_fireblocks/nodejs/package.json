@@ -13,8 +13,9 @@
     "@fireblocks/fireblocks-web3-provider": "^1.2.3",
     "aws-sdk": "^2.1394.0",
     "axios": "^1.4.0",
+    "ethers": "^6.5.1",
     "fireblocks-sdk": "^5.1.4",
-    "web3": "^4.0.1",
+    "web3": "^1.10.0",
     "xhr2": "^0.2.1"
   }
 }

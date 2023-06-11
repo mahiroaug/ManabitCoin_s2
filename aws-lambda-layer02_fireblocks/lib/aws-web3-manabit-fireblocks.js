@@ -14,8 +14,8 @@ const { inspect } = require('util');
 const AWSHttpProvider = require('@aws/web3-http-provider');
 
 ///// set ENV
-secretName = process.env.SSM_SECRET_NAME;
-region = process.env.SSM_REGION;
+const secretName = process.env.SSM_SECRET_NAME;
+const region = process.env.SSM_REGION;
 
 ///// file path
 const contract_path_coin = 'lib/contracts/ManabitCoin.sol/ManabitCoin.json'
@@ -25,9 +25,6 @@ const fireblocks_path_key = 'lib/fireblocks_secret.key'
 ///// definition
 let network;
 
-//let owner;
-//let signer;
-
 let COIN_CA;
 let GACHA_CA;
 let COIN_ABI;
@@ -36,7 +33,7 @@ let Coin;
 let Gacha;
 
 let web3aws;
-let web3fb;
+let web3;
 
 let signerAddr;
 
@@ -60,6 +57,7 @@ async function init_ENV() {
 
         // aws
         const endpoint = secrets.AMB_HTTP_ENDPOINT;
+        console.log("endpoint: ",endpoint);
         web3aws = new Web3(new AWSHttpProvider(endpoint));
         web3aws.eth.getNodeInfo().then(console.log);
         //owner = web3aws.eth.accounts.privateKeyToAccount(secrets.OWNER_PRIVATE_KEY);
@@ -68,22 +66,22 @@ async function init_ENV() {
 
         // fireblocks
         const fb_apiSecret = fs.readFileSync(path.resolve(fireblocks_path_key), "utf8");
-        const fb_apiKey = secrets.FIREBLOCKS_API_KEY
-        const fb_vaultId = secrets.FIREBLOCKS_VAULT_ACCOUNT_ID
+        const fb_apiKey = secrets.FIREBLOCKS_API_KEY;
+        const fb_vaultId = secrets.FIREBLOCKS_VAULT_ACCOUNT_ID;
         const eip1193Provider = new FireblocksWeb3Provider({
             privateKey: fb_apiSecret,
             apiKey: fb_apiKey,
             vaultAccountIds: fb_vaultId,
             chainId: ChainId.GOERLI,
         });
-        web3fb = new Web3(eip1193Provider);
-        const myAddr = await web3fb.eth.getAccounts();
+        web3 = new Web3(eip1193Provider);
+        const myAddr = await web3.eth.getAccounts();
         signerAddr = myAddr[0];
         console.log('signerAddr=',inspect(signerAddr, false, null, true));
 
         // contract object
-        Coin = new web3fb.eth.Contract(COIN_ABI, COIN_CA);
-        Gacha = new web3fb.eth.Contract(GACHA_ABI, GACHA_CA);
+        Coin = new web3.eth.Contract(COIN_ABI, COIN_CA);
+        Gacha = new web3.eth.Contract(GACHA_ABI, GACHA_CA);
         //Coin = new web3.eth.Contract(COIN_ABI, COIN_CA, { from: signer.address });
         //Gacha = new web3.eth.Contract(GACHA_ABI, GACHA_CA, { from: signer.address });
 
@@ -101,13 +99,13 @@ async function getAccountBalance(address) {
     console.log(`Account: ${address}`);
     try{
         // ETH Balance
-        const balanceWei = await web3aws.eth.getBalance(address);
-        const balanceETH = await web3aws.utils.fromWei(balanceWei, 'ether');
+        const balanceWei = await web3.eth.getBalance(address);
+        const balanceETH = await web3.utils.fromWei(balanceWei, 'ether');
         console.log(`ETH Balance : ${balanceETH} ETH`);
 
         // MNBC Balance
         const balanceMNBCw = await Coin.methods.balanceOf(address).call();
-        const balanceMNBC = await web3aws.utils.fromWei(balanceMNBCw, 'ether');
+        const balanceMNBC = await web3.utils.fromWei(balanceMNBCw, 'ether');
         console.log(`MNBC Balance: ${balanceMNBC} MNBC`);
 
         return {
@@ -122,13 +120,13 @@ async function getAccountBalance(address) {
     }
 }
 
-async function getAllowance(signer_address,spender_address){
+async function getAllowance(spender_address){
     await init_ENV();
 
     console.log(`spender Account: ${spender_address}`);
     try{
         const allowance = await Coin.methods.allowance(signer_address,spender_address).call();
-        const allowanceMNBC = await web3aws.utils.fromWei(allowance.toString(),"ether");
+        const allowanceMNBC = await web3.utils.fromWei(allowance.toString(),"ether");
         console.log('Allowance: ',allowanceMNBC);
 
         return {
@@ -146,7 +144,7 @@ async function getAllowance(signer_address,spender_address){
 const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
 
     // check toAddress
-    const toAddress = web3aws.utils.toChecksumAddress(_to);
+    const toAddress = await web3.utils.toChecksumAddress(_to);
     console.log(' toAddress:',toAddress);
 
     // gasLimit
@@ -163,13 +161,13 @@ const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
     console.log(' setGasLimit:', setGasLimit);
 
     // gasPrice
-    const gasPrice = await web3aws.eth.getGasPrice();
+    const gasPrice = await web3.eth.getGasPrice();
     const gasPriceInGwei = await web3aws.utils.fromWei(gasPrice.toString(), 'gwei');
     console.log(' gasPrice:', gasPrice,'(', gasPriceInGwei,'Gwei)');
 
     // estimate max Transaction Fee
     const estimateMaxTxFee = setGasLimit * gasPrice;
-    const estimateMaxTxFeeETH = await web3aws.utils.fromWei(estimateMaxTxFee.toString(), 'ether');
+    const estimateMaxTxFeeETH = await web3.utils.fromWei(estimateMaxTxFee.toString(), 'ether');
     console.log(' estimate MAX Tx Fee:', estimateMaxTxFee, '(', estimateMaxTxFeeETH, 'ETH)');
 
 /*
@@ -194,11 +192,11 @@ const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
     console.log(` Tx successful with hash: ${createReceipt.transactionHash} in block ${createReceipt.blockNumber}`);
  */
 
-    const createReceipt = await web3fb.eth.sendTransaction({
+    const createReceipt = await web3.eth.sendTransaction({
         to: toAddress,
         from: _signer,
         data: _tx.encodeABI(),
-        gas: await web3fb.utils.toHex(setGasLimit)
+        gas: await web3.utils.toHex(setGasLimit)
     }).once("transactionHash", (txhash) => {
         console.log(` Send transaction ...`);
         console.log(` https://${network}.etherscan.io/tx/${txhash}`);
@@ -209,13 +207,13 @@ const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
     // result 
     const etherscan = `https://${network}.etherscan.io/tx/${createReceipt.transactionHash}`;
 
-    const effectiveGasPriceGwei = await web3aws.utils.fromWei(createReceipt.effectiveGasPrice.toString(), 'gwei');
+    const effectiveGasPriceGwei = await web3.utils.fromWei(createReceipt.effectiveGasPrice.toString(), 'gwei');
     const effectiveGasPrice_str = createReceipt.effectiveGasPrice + ' wei (' + effectiveGasPriceGwei + ' Gwei)'
     console.log('',effectiveGasPrice_str);
 
     const effectiveTxFee = createReceipt.gasUsed * createReceipt.effectiveGasPrice;
-    const effectiveTxFeeGwei = await web3aws.utils.fromWei(effectiveTxFee.toString(), 'gwei');
-    const effectiveTxFeeETH = await web3aws.utils.fromWei(effectiveTxFee.toString(), 'ether');
+    const effectiveTxFeeGwei = await web3.utils.fromWei(effectiveTxFee.toString(), 'gwei');
+    const effectiveTxFeeETH = await web3.utils.fromWei(effectiveTxFee.toString(), 'ether');
     const effectiveTxFee_str = effectiveTxFee +  ' wei (' + effectiveTxFeeGwei + ' Gwei) (' + effectiveTxFeeETH + ' ETH)'
     console.log(' ',effectiveTxFee_str);
 
@@ -239,12 +237,12 @@ const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
 
 
 // Gachaコントラクトに対して必要量のMNBCトークン使用許可を与える
-async function approveGacha(signerAddr,amount){
+async function approveGacha(amount){
     await init_ENV();
 
     console.log(`Approve amount to GACHA_CA: ${amount} MNBC`);
     try{
-        const weiAmount = await web3aws.utils.toWei(amount.toString(),"ether");
+        const weiAmount = await web3.utils.toWei(amount.toString(),"ether");
         const tx = await Coin.methods.approve(GACHA_CA, weiAmount);
         const receipt = await sendTx(COIN_CA,tx,signerAddr,150000);
         console.log(('receipt:',receipt));
@@ -262,7 +260,7 @@ async function transferMNBC(to_address, amount){
 
     console.log((`transfer ${amount} MNBC to ${to_address}`));
     try{
-        const weiAmount = await web3aws.utils.toWei(amount.toString(),"ether");
+        const weiAmount = await web3.utils.toWei(amount.toString(),"ether");
         const tx = await Coin.methods.transfer(to_address, weiAmount);
         const receipt = await sendTx(COIN_CA,tx,owner,150000);
         console.log(('receipt:',receipt));
@@ -275,13 +273,13 @@ async function transferMNBC(to_address, amount){
 }
 
 
-async function sendManabit(signerAddr, to, amount, comment){
+async function sendManabit(to, amount, comment){
     await init_ENV();
 
     console.log((`send Manabit ${amount} MNBC to ${to} with comment "${comment}"`));
 
     try{
-        const weiAmount = await web3aws.utils.toWei(amount.toString(),"ether");
+        const weiAmount = await web3.utils.toWei(amount.toString(),"ether");
         const tx = await Gacha.methods.sendManabitCoin(comment, to, weiAmount);
         const receipt = await sendTx(GACHA_CA,tx,signerAddr,300000);
         console.log(('receipt:',receipt));
