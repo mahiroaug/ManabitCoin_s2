@@ -151,3 +151,39 @@ cd lib
 
 
 
+# ------Goerli Network with AMB & Fireblocks------
+
+
+### .env
+```
+FIREBLOCKS_API_KEY=
+FIREBLOCKS_URL=https://api.fireblocks.io
+FIREBLOCKS_VAULT_ACCOUNT_ID=
+FIREBLOCKS_VAULT_ACCOUNT_NAME=
+FIREBLOCKS_ASSET_ID_ETH=
+FIREBLOCKS_ASSET_ID_MNBC=
+FIREBLOCKS_GACHA_NAME=
+```
+
+allocate secret.key file on project root directory
+
+`fireblocks_secret.key`
+
+
+#### test Script
+
+node testScript_03aws-fireblocks/<*.js>
+
+
+### AWS Lambda Function
+
+cd aws-lambda-layer02_fireblocks
+
+#### deploy lambda
+
+allocate secret.key file at `lib/fireblocks_secret.key`
+
+- nodejs_layer.zip -> layer
+- lib(directory) -> code source
+- index.js -> code source
+
