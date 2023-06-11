@@ -147,4 +147,7 @@ artifacts
 # AWS lambda layer file
 nodejs_layer.zip
 lambda_func.zip
+*.zip
 
+# fireblocks secret key
+*.key

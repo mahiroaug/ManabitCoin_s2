@@ -1,0 +1,173 @@
+import './App.css';
+import { useEffect, useState } from 'react';
+import detectEthereumProvider from '@metamask/detect-provider';
+import Web3 from 'web3';
+
+// ManabitGacha Contract
+import Gacha_JSON from "./contracts/ManabitGacha.sol/ManabitGacha.json";
+const Gacha_ABI = Gacha_JSON.abi;
+const Gacha_CA = "0x1709FF281d5a75F1145B82825f4B1Fa8e8Aa3e06";
+let web3;
+let Gacha;
+
+const Chains = {
+  1: "Mainnet",
+  3: "Ropsten",
+  5: "Goerli",
+}
+
+const getAccount = async () => {
+  try {
+    const account = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    if (account.length > 0) {
+      return account[0];
+    } else {
+      return "";
+    }
+  } catch (err) {
+    if (err.code === 4001) {
+      // EIP-1193 userRejectedRequest error
+      // If this happens, the user rejected the connection request.
+      console.log('Please connect to MetaMask.');
+    } else {
+      console.error(err);
+    }
+    return "";
+  }
+}
+
+const getChainID = async () => {
+  const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+  return parseInt(chainId);
+}
+
+
+const handleAccountChanged = async (accountNo, setAccount, setChainId) => {
+  const account = await getAccount();
+  setAccount(account);
+
+  const chainId = await getChainID();
+  setChainId(chainId);
+}
+
+
+// get Manabit List
+async function getLists(){
+  try{
+    const events = await Gacha.getPastEvents(
+      'Manabit',
+      {
+        fromBlock: 0,
+        toBlock: 'latest'
+      });
+
+    const manabitList = document.getElementById("Manabit-list");
+    manabitList.innerHTML = `
+      <tr>
+        <th>From</th>
+        <th>To</th>
+        <th>Amount</th>
+        <th>Comment</th>
+      </tr>
+    `;
+
+    events.forEach((event) => {
+      const { sender, receiver, amount, comment } = event.returnValues;
+      const newRow = manabitList.insertRow(-1);
+      newRow.insertCell(0).innerText = sender;
+      newRow.insertCell(1).innerText = receiver;
+      newRow.insertCell(2).innerText = web3.utils.fromWei(amount, "ether");
+      newRow.insertCell(3).innerText = comment;
+    });
+  } catch (error) {
+    console.error("Error: getting List:", error);
+  }
+}
+
+
+
+
+function App() {
+  const [address, setAddress] = useState("");
+  const [account, setAccount] = useState("-");
+  const [chainId, setChainId] = useState(0);
+  const btnDisabled = account != "-";
+
+
+  const enable = async () => {
+    const provider = await detectEthereumProvider({ mustBeMetaMask: true });
+    if (provider && window.ethereum?.isMetaMask) {
+      console.log('Welcome to MetaMask User🎉');
+      
+      web3 = new Web3(Web3.givenProvider);
+      web3.eth.defaultChain = "goerli";
+      
+      const accounts = await web3.eth.requestAccounts();
+      setAddress(accounts[0]);
+
+      Gacha = new web3.eth.Contract(Gacha_ABI,Gacha_CA);
+
+    } else {
+      console.log('Please Install MetaMask🙇‍♂️')
+    }
+  }
+
+  enable();
+
+  const initializeAccount = async () => {
+    const account = getAccount();
+    if (account != "") {
+      handleAccountChanged(account, setAccount, setChainId);
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window.ethereum !== 'undefined') {
+      window.ethereum.on("accountsChanged", (accountNo) => handleAccountChanged(accountNo, setAccount, setChainId));
+      window.ethereum.on("chainChanged", (accountNo) => handleAccountChanged(accountNo, setAccount, setChainId));
+    }
+  }, [account]);
+
+
+  //getLists();
+
+
+
+  return (
+    <div>
+      <h2>MetaMask test</h2>
+      
+      <div>
+        <h3>web3.givenProvider check</h3>
+        <p id="account">Address: {address}</p>
+      </div>
+
+
+      <div>
+        <h3>handleAccountChanged</h3>
+        <button id="GetAccountButton" onClick={initializeAccount} disabled={btnDisabled}>Get Account</button>
+        <p id="account">[eth_requestAccounts] : Address: {account}</p>
+        <p id="account">[eth_chainId] : Chain ID: {chainId}</p>
+        <p id="account">Chain Name: {Chains[chainId]}</p>
+      </div>
+
+      <div>
+        <h3>ManabitList</h3>
+          <table id="Manabit-list">
+          <thead>
+          <tr>
+            <th>Sender</th>
+            <th>Receiver</th>
+            <th>Amount</th>
+            <th>Comment</th>
+          </tr>
+          </thead>
+          <tbody></tbody>
+          </table>
+      </div>
+
+    </div >
+  );
+}
+
+export default App;

@@ -1,13 +1,6 @@
-const SecretsManager = require('lib/secretsManager.js');
-const manabitCC = require('lib/aws-web3-manabit.js') //CC=Contract Call
-
-
+const manabitCC = require('lib/aws-web3-manabit-fireblocks.js') //CC=Contract Call
 
 exports.handler = async (event, context) => {
-
-    const secretName = 'web3-manaBit-ssm';
-    const region = 'ap-northeast-1';
-    const secrets = await SecretsManager.getSecret(secretName, region);
 
     let output;
     switch(event.action){

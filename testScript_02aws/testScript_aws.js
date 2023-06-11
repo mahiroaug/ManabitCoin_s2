@@ -21,7 +21,7 @@ async function main() {
 
 
         console.log("---step2--------approveGacha(1000)------------");
-        //await manabitCC.approveGacha(500);
+        await manabitCC.approveGacha(500);
 
         console.log("---step2b-------getAllowance(GACHA_CA)--------");
         await manabitCC.getAllowance(GACHA_CA);
@@ -47,7 +47,7 @@ async function main() {
 
 
         console.log("---step4----------sendManabit (to TEST Wallet)---------------");
-        await manabitCC.sendManabit(process.env.MY_TEST_ADDRESS,15,"2023/06/01_17:00|15 Star|mats");
+        //await manabitCC.sendManabit(process.env.MY_TEST_ADDRESS,15,"2023/06/01_17:00|15 Star|mats");
 
         console.log("---step4b--------getOwnerBalance-------------------------");
         //await manabitCC.getOwnerBalance();
