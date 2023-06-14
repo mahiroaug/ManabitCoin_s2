@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-metamaskapp-dev-31036-authRole",
+      "UnauthRoleArn": "arn:aws:iam::315616927906:role/amplify-metamaskapp-dev-31036-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::315616927906:role/amplify-metamaskapp-dev-31036-authRole",
+      "Region": "ap-northeast-1",
+      "DeploymentBucketName": "amplify-metamaskapp-dev-31036-deployment",
+      "UnauthRoleName": "amplify-metamaskapp-dev-31036-unauthRole",
+      "StackName": "amplify-metamaskapp-dev-31036",
+      "StackId": "arn:aws:cloudformation:ap-northeast-1:315616927906:stack/amplify-metamaskapp-dev-31036/dea34de0-0997-11ee-824b-0a494010225d",
+      "AmplifyAppId": "doqgmpzr12wp1"
+    },
+    "categories": {
+      "api": {
+        "metamaskapp": {}
+      }
+    }
+  }
+}
