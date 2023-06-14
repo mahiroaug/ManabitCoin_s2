@@ -77,7 +77,8 @@ async function init_ENV() {
         web3 = new Web3(eip1193Provider);
         const myAddr = await web3.eth.getAccounts();
         signerAddr = myAddr[0];
-        console.log('signerAddr=',inspect(signerAddr, false, null, true));
+        console.log('signerAddrInspect=',inspect(signerAddr, false, null, true));
+        console.log('signerAddr=',signerAddr);
 
         // contract object
         Coin = new web3.eth.Contract(COIN_ABI, COIN_CA);
@@ -162,7 +163,7 @@ const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
 
     // gasPrice
     const gasPrice = await web3.eth.getGasPrice();
-    const gasPriceInGwei = await web3aws.utils.fromWei(gasPrice.toString(), 'gwei');
+    const gasPriceInGwei = await web3.utils.fromWei(gasPrice.toString(), 'gwei');
     console.log(' gasPrice:', gasPrice,'(', gasPriceInGwei,'Gwei)');
 
     // estimate max Transaction Fee

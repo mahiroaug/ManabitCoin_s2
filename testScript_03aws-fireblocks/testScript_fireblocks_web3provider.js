@@ -75,7 +75,7 @@ async function getAllowance(signer_address,spender_address){
 
     // get Account Balance
     const test_addr = process.env.MY_TEST_ADDRESS;
-    await getAccountBalance(test_addr);
+    //await getAccountBalance(test_addr);
 
     // get Allowance
     await getAllowance(process.env.OWNER_ADDRESS,GACHA_CA);

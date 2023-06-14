@@ -204,7 +204,7 @@ async function sendManabit(signerAddr, to, amount, comment){
 
 
     // send Manabit
-    //await sendManabit(signer_addressFB,test_addr,1,"2023/06/08_17:01|testScript");
+    await sendManabit(signer_addressFB,test_addr,1,"2023/06/08_17:01|testScript");
 
 
     // get Allowance

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JSONファイル読み込み</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div id="json-content"></div>
+
+  <script>
+    axios.get('http://127.0.0.1:8080/contracts/ManabitCoin.sol/ManabitCoin.json')
+      .then(response => {
+        var jsonData = response.data;
+        var jsonContent = document.getElementById('json-content');
+        jsonContent.textContent = JSON.stringify(jsonData, null, 2);
+      })
+      .catch(error => {
+        console.log('Error:', error);
+      });
+  </script>
+</body>
+</html>
