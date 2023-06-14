@@ -5,7 +5,7 @@ const ccxt = require('ccxt');
 
 const app = express();
 
-const INFURA_PROJECT_ID = "2ab30db775414b0baa1c35b97036e5b3"
+const INFURA_PROJECT_ID = ""
 const web3 = new Web3(
     new Web3.providers.HttpProvider(
       `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
