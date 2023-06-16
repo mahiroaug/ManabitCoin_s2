@@ -18,7 +18,7 @@ const MANABOT01_OWNER_ADDRESS = process.env.OWNER_ADDRESS;
 
 const web3 = new Web3(
     new Web3.providers.HttpProvider(
-      `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
+        `https://goerli.infura.io/v3/${INFURA_PROJECT_ID}`
     )
 );
 
