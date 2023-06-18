@@ -15,6 +15,7 @@ const binanceExchange = new ccxt.binance({ enableRateLimit: true });
 
 const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID || "";
 const MANABOT01_OWNER_ADDRESS = process.env.OWNER_ADDRESS; 
+const MANABOT02_OWNER_ADDRESS = process.env.FIREBLOCKS_VAULT_ACCOUNT_ADDRESS
 
 const web3 = new Web3(
     new Web3.providers.HttpProvider(
@@ -74,6 +75,24 @@ const fetch_price_In_USD = async () => {
         return null;
     }
 };
+
+
+const get_Allowance = async () => {
+    try {
+        const allowance01 = await Coin.methods.allowance(MANABOT01_OWNER_ADDRESS,GACHA_CA).call();
+        const allowance02 = await Coin.methods.allowance(MANABOT02_OWNER_ADDRESS,GACHA_CA).call();
+
+        return {
+            allowance01: allowance01,
+            allowance02: allowance02
+        };
+
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+};
+
 
 const get_Manabit_List = async () => {
     try {
@@ -145,11 +164,20 @@ app.post('/get_balance', async (req,res) => {
 
 });
 
+app.post('/get_allowance', async(req,res) => {
+    console.log('call POST[get_allowance]');
+    const result = await get_Allowance();
+    console.log('result: ',result);
+
+});
+
+
 app.post('/get_manabit', async(req,res) => {
     console.log('call POST[get_manabit]');
     const result = await get_Manabit_List();
     console.log('result: ',result);
 
+    res.json({ MANABOT01_OWNER_ADDRESS, result.allowance01, MANABOT02_OWNER_ADDRESS, result.allowance02 });
 });
 
 const PORT = 3000;
