@@ -20,15 +20,15 @@ document.getElementById('wallet-balance-form').addEventListener('submit', async 
             document.getElementById('usd-balance').textContent = balanceUSD.toFixed(2);
             document.getElementById('eth-usd-rate').textContent = `${priceUSD} USD/ETH`;
             document.getElementById('mnbc-balance').textContent = balanceMNBC;
-            document.getElementById('mnbc-allowance').textContent = allowanceMNBC;
-            document.getElementById('output').style.display = 'block';
+            //document.getElementById('mnbc-allowance').textContent = allowanceMNBC;
+           // document.getElementById('output').style.display = 'block';
         } else {
-            document.getElementById('output').style.display = 'none';
+           // document.getElementById('output').style.display = 'none';
             alert('Error: please check address');
         }
     } catch (err) {
         //console.error(err);
-        document.getElementById('output').style.display = 'none';
+        //document.getElementById('output').style.display = 'none';
         alert('Error: send Address to Server');
     }
 });
@@ -44,16 +44,22 @@ document.getElementById('allowance-form').addEventListener('submit', async (even
         const serverResponse = await fetch('/get_allowance', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: '',
+            body: "",
         });
+        console.log("serverresponse: ",serverResponse);
 
         if (serverResponse.ok) {
-            const { addr01, allowance01, addr02, allowance02 } = await serverResponse.json();
+            const { addr01,allow01,mnbc01,eth01,addr02,allow02,mnbc02,eth02 } = await serverResponse.json();
+            console.log("json: ",addr01,allow01,mnbc01,eth01,addr02,allow02,mnbc02,eth02);
 
             document.getElementById('OWNER_ADDRESS01').textContent = addr01;
-            document.getElementById('ALLOWANCE01').textContent = allowance01;
+            document.getElementById('ALLOWANCE01').textContent = allow01;
+            document.getElementById('BALANCEMNBC01').textContent = mnbc01;
+            document.getElementById('BALANCEETH01').textContent = eth01;
             document.getElementById('OWNER_ADDRESS02').textContent = addr02;
-            document.getElementById('ALLOWANCE02').textContent = allowance02;
+            document.getElementById('ALLOWANCE02').textContent = allow02;
+            document.getElementById('BALANCEMNBC02').textContent = mnbc02;
+            document.getElementById('BALANCEETH02').textContent = eth02;
 
             //document.getElementById('output').style.display = 'block'
         }

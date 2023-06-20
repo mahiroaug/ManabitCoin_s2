@@ -8,55 +8,105 @@
         <!--link rel="stylesheet" herf="css/style.css"-->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/spcss@0.9.0">
     </head>
+
     <body>
+
         <!--page title-->
         <h1>まなびっとウォレット</h1>
 
+        ウォレットアドレスの残高を確認できます
+
         <!--wallet form-->
+        <style>
+            #wallet-addr {
+              width: 350px;
+            }
+        </style>
         <form id="wallet-balance-form">
             <label for="wallet-addr">Wallet Address</label>
-            <input type="text" id="wallet-addr" required maxlength="45">
+            <input type="text" id="wallet-addr" required maxlength="42">
             <button type="submit">submit</button>
         </form>
 
         <!--display-->
-        <div id="output" style="display: none;">
-            <p>ETH BALANCE: <span id="eth-balance"></span> ETH</p>
-            <p> -> in USD: <span id="usd-balance"></span> USD (<span id="eth-usd-rate"></span>)</p>
-            <p>MNBC BALANCE: <span id="mnbc-balance"></span> MNBC</p>
-            <p>MNBC ALLOWANCE: <span id="mnbc-allowance"></span> MNBC</p>
-        </div>
+        <style>
+            #wallet-info th,
+            #wallet-info td {
+                font-size: 10px;
+            }
+        </style>
+
+        <table id="wallet-info">
+            <tr>
+                <th>key</th>
+                <th>value</th>
+                <th>comment</th>
+            </tr>
+            <tr>
+                <th>ETH</th>
+                <th id="eth-balance"></th>
+                <th></th>
+            </tr>
+            <tr>
+                <th>(-> USD相当)</th>
+                <th id="usd-balance"></th>
+                <th id="eth-usd-rate"></th>
+            </tr>
+            <tr>
+                <th>MNBC</th>
+                <th id="mnbc-balance"></th>
+                <th></th>
+            </tr>
+        </table>
+
+
 
         <hr>
 
         <h1>まなびっとallowance</h1>
+
+        まなびっとGachaコントラクトに付与したallowance量を確認できます
 
         <!--allowance form-->
         <form id="allowance-form">
             <button type="submit">get allowance</button>
         </form>
 
+        <style>
+            #allowance-list th,
+            #allowance-list td {
+                font-size: 10px;
+            }
+        </style>
+
+
         <!--display-->
-        <h2>ManabitCoin Allowance</h2>
         <table id="allowance-list">
         <thead>
             <tr>
                 <th>Provider</th>
-                <th>Address</th>
+                <th>まな神Address</th>
                 <th>Allowance(MNBC)</th>
+                <th>Balance(MNBC)</th>
+                <th>Balance(ETH)</th>
             </tr>
+        </thead>
+        <tbody>
             <tr>
                 <th>AMB</th>
                 <th id="OWNER_ADDRESS01"></th>
                 <th id="ALLOWANCE01"></th>
+                <th id="BALANCEMNBC01"></th>
+                <th id="BALANCEETH01"></th>
             </tr>
             <tr>
                 <th>Fireblocks</th>
                 <th id="OWNER_ADDRESS02"></th>
                 <th id="ALLOWANCE02"></th>
+                <th id="BALANCEMNBC02"></th>
+                <th id="BALANCEETH02"></th>
             </tr>
-        </thead>
-        <tbody></tbody>
+        </tbody>
         </table>
 
 
@@ -70,7 +120,6 @@
         </form>
 
         <!--display-->
-        <h2>Manabit Memorial</h2>
         <table id="manabit-list">
         <thead>
         <tr>

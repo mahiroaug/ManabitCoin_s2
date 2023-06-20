@@ -8,6 +8,7 @@ const ccxt = require('ccxt');
 const fs = require('fs');
 const path = require('path');
 const e = require('express');
+const { allowedNodeEnvironmentFlags } = require('process');
 
 const app = express();
 
@@ -81,10 +82,12 @@ const get_Allowance = async () => {
     try {
         const allowance01 = await Coin.methods.allowance(MANABOT01_OWNER_ADDRESS,GACHA_CA).call();
         const allowance02 = await Coin.methods.allowance(MANABOT02_OWNER_ADDRESS,GACHA_CA).call();
+        const allow01 = web3.utils.fromWei(allowance01, 'ether');
+        const allow02 = web3.utils.fromWei(allowance02, 'ether');
 
         return {
-            allowance01: allowance01,
-            allowance02: allowance02
+            allowance01: allow01,
+            allowance02: allow02
         };
 
     } catch (err) {
@@ -167,7 +170,26 @@ app.post('/get_balance', async (req,res) => {
 app.post('/get_allowance', async(req,res) => {
     console.log('call POST[get_allowance]');
     const result = await get_Allowance();
-    console.log('result: ',result);
+
+    const addr01 = MANABOT01_OWNER_ADDRESS; 
+    const addr02 = MANABOT02_OWNER_ADDRESS;
+    const eth01 = await fetch_ETH_Balance(addr01);
+    const eth02 = await fetch_ETH_Balance(addr02);
+    const mnbc01 = await get_MNBC_Balance(addr01);
+    const mnbc02 = await get_MNBC_Balance(addr02);
+
+    if(result.allowance01 !== null && result.allowance02 !== null){ 
+        console.log('result: ',result);
+        const allow01 = result.allowance01;
+        const allow02 = result.allowance02;
+
+
+        console.log("inspect: ",addr01,allow01,mnbc01,eth01,addr02,allow02,mnbc02,eth02);
+        // responce to client
+        res.json({addr01,allow01,mnbc01,eth01,addr02,allow02,mnbc02,eth02});
+    } else {
+        res.status(500).json({ error: 'server error'});
+    }
 
 });
 
@@ -177,7 +199,6 @@ app.post('/get_manabit', async(req,res) => {
     const { allowance01, allowance02 } = await get_Manabit_List();
     console.log('result: ',result);
 
-    res.json({ MANABOT01_OWNER_ADDRESS, allowance01, MANABOT02_OWNER_ADDRESS, allowance02 });
 });
 
 const PORT = 3000;
