@@ -162,6 +162,38 @@ async function sendManabit(signerAddr, to, amount, comment){
     }
 }
 
+async function getManabitList(){
+    try{
+
+        const events = await GachaFB.getPastEvents(
+            'allEvents',
+            {
+                fromtBlock: 8000000,
+                toBlock: 'latest'
+            }
+        );
+
+/*
+        const events = await CoinFB.getPastEvents(
+            "allEvents",
+            {
+                fromtBlock: 0,
+                toBlock: 'latest'
+            }
+        )
+*/
+
+        console.log('get_Manabit_List inspect: ',inspect(events, false, null, true))
+        //console.log('get_Manabit_List: ',events);
+        return events;
+
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
+
 
 
 
@@ -194,24 +226,24 @@ async function sendManabit(signerAddr, to, amount, comment){
     // get Allowance
     await getAllowance(signer_addressFB,GACHA_CA);
 
-
     // approveGacha
     //await approveGacha(signer_addressFB,500)
-
 
     // get Allowance
     await getAllowance(signer_addressFB,GACHA_CA);
 
-
     // send Manabit
-    await sendManabit(signer_addressFB,test_addr,1,"2023/06/08_17:01|testScript");
-
+    //await sendManabit(signer_addressFB,test_addr,1,"2023/06/08_17:01|testScript");
 
     // get Allowance
     await getAllowance(signer_addressFB,GACHA_CA);
 
     // get Balance
     await getAccountBalance(signer_addressFB);
+
+
+    // get ManabitList
+    await getManabitList();
 
 
 

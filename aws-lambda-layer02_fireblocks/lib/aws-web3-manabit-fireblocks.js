@@ -193,11 +193,17 @@ const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
     console.log(` Tx successful with hash: ${createReceipt.transactionHash} in block ${createReceipt.blockNumber}`);
  */
 
+    const GasHex = await web3.utils.toHex(setGasLimit)
+    console.log("toAddress: ", toAddress);
+    console.log("_signer: ", _signer);
+    console.log("_tx: ",_tx);
+    console.log("gas: ",GasHex)
+
     const createReceipt = await web3.eth.sendTransaction({
         to: toAddress,
         from: _signer,
         data: _tx.encodeABI(),
-        gas: await web3.utils.toHex(setGasLimit)
+        gas: GasHex
     }).once("transactionHash", (txhash) => {
         console.log(` Send transaction ...`);
         console.log(` https://${network}.etherscan.io/tx/${txhash}`);
