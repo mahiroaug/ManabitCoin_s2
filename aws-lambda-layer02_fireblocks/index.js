@@ -106,7 +106,7 @@ async function _transferMNBC(event) {
 async function _sendManabit (event) {
     // to_address,指定量(MNBC),コメントをチェック
     const address = event.param.to_address;
-    const amount = event.param.amount;
+    let amount = event.param.amount;
     const comment = event.param.comment;
 
     // MNBC指定上限

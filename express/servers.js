@@ -174,10 +174,10 @@ app.post('/get_allowance', async(req,res) => {
 
 app.post('/get_manabit', async(req,res) => {
     console.log('call POST[get_manabit]');
-    const result = await get_Manabit_List();
+    const { allowance01, allowance02 } = await get_Manabit_List();
     console.log('result: ',result);
 
-    res.json({ MANABOT01_OWNER_ADDRESS, result.allowance01, MANABOT02_OWNER_ADDRESS, result.allowance02 });
+    res.json({ MANABOT01_OWNER_ADDRESS, allowance01, MANABOT02_OWNER_ADDRESS, allowance02 });
 });
 
 const PORT = 3000;
