@@ -20,7 +20,6 @@ document.getElementById('wallet-balance-form').addEventListener('submit', async 
             document.getElementById('usd-balance').textContent = balanceUSD.toFixed(2);
             document.getElementById('eth-usd-rate').textContent = `${priceUSD} USD/ETH`;
             document.getElementById('mnbc-balance').textContent = balanceMNBC;
-            //document.getElementById('mnbc-allowance').textContent = allowanceMNBC;
            // document.getElementById('output').style.display = 'block';
         } else {
            // document.getElementById('output').style.display = 'none';
@@ -61,12 +60,10 @@ document.getElementById('allowance-form').addEventListener('submit', async (even
             document.getElementById('BALANCEMNBC02').textContent = mnbc02;
             document.getElementById('BALANCEETH02').textContent = eth02;
 
-            //document.getElementById('output').style.display = 'block'
         }
 
     } catch (err) {
         console.error(err);
-        //document.getElementById('output').style.display = 'none'
     }
 
 });
@@ -88,13 +85,14 @@ document.getElementById('manabit-list-form').addEventListener('submit', async (e
             headers: { 'Content-Type': 'application/json' },
             body: '',
         });
+        console.log("serverresponse: ",serverResponse);
 
         if (serverResponse.ok) {
-            document.getElementById('output').style.display = 'block'
+            null;
         }
 
     } catch (err) {
-        document.getElementById('output').style.display = 'none'
+        null;
     }
 
 });

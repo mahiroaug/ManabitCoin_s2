@@ -39,6 +39,8 @@ let myAddrFB;
 let signer_addressFB;
 let CoinFB;
 let GachaFB;
+let CoinAWS;
+let GachaAWS;
 
 //// AMB
 const amb_endpoint = process.env.AMB_HTTP_ENDPOINT;
@@ -165,26 +167,47 @@ async function sendManabit(signerAddr, to, amount, comment){
 async function getManabitList(){
     try{
 
-        const events = await GachaFB.getPastEvents(
-            'allEvents',
-            {
-                fromtBlock: 8000000,
-                toBlock: 'latest'
-            }
-        );
+        const createdBlock = 9096880; // The block number created Gacha-Contract
+        const latestBlock = await web3FB.eth.getBlockNumber(); // The latest block number
+        const last1day = 8192;
+        const last1dayBlock = latestBlock - last1day;
+        const blockRange = 1000;
+        let fromBlock = last1dayBlock;
+        let toBlock = (fromBlock + blockRange) > latestBlock ? latestBlock : fromBlock + blockRange;
+        let events = [];
+
+        while (true) {
+            const event = await GachaFB.getPastEvents(
+                'Manabit',
+                {
+                    fromBlock: fromBlock,
+                    toBlock: toBlock
+                }
+            ).then(console.log);
+
+            events = events.concat(event);
+
+            if (toBlock >= latestBlock) {
+                break;
+                }
+            fromBlock = toBlock + 1;
+            toBlock = (fromBlock + blockRange) > latestBlock ? latestBlock : fromBlock + blockRange;
+           
+        }
+        console.log('get_Manabit_List inspect: ',inspect(events, false, null, true));
+
 
 /*
-        const events = await CoinFB.getPastEvents(
-            "allEvents",
+        const events2 = await CoinFB.getPastEvents(
+            'allEvents',
             {
-                fromtBlock: 0,
+                fromBlock: 1,
                 toBlock: 'latest'
             }
-        )
+        ).then(console.log);
+        console.log('get_Coin inspect: ',inspect(events2, false, null, true));
 */
 
-        console.log('get_Manabit_List inspect: ',inspect(events, false, null, true))
-        //console.log('get_Manabit_List: ',events);
         return events;
 
     } catch (err) {
@@ -208,6 +231,8 @@ async function getManabitList(){
     // initializer on AMB ////////////////////////////////////////////
     web3aws = new Web3(new AWSHttpProvider(amb_endpoint));
     web3aws.eth.getNodeInfo().then(console.log);
+    CoinAWS = new web3aws.eth.Contract(COIN_ABI, COIN_CA);
+    GachaAWS = new web3aws.eth.Contract(GACHA_ABI, GACHA_CA);
 
 
     // get Account Balance
