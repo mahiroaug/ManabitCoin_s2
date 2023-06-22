@@ -88,8 +88,20 @@ document.getElementById('manabit-list-form').addEventListener('submit', async (e
         console.log("serverresponse: ",serverResponse);
 
         if (serverResponse.ok) {
-            null;
-        }
+            const jsonData = await serverResponse.json();
+
+
+            jsonData.forEach(function(x) {
+                console.log(x);
+                const number = x.blockNumber;
+                //const hash = x.blockHash;
+                const address = x.address;
+                const comment = x.comment;
+                
+                $('#manabit-list').append('<tr><td>' + number + '</td><td>' + address + '</td><td>' + comment + '</td></tr>');
+     
+             });
+       }
 
     } catch (err) {
         null;

@@ -118,8 +118,9 @@ const get_Manabit_List = async () => {
                     fromBlock: fromBlock,
                     toBlock: toBlock
                 }
-            ).then(console.log);
+            );
 
+            console.log(event);
             events = events.concat(event);
 
             if (toBlock >= latestBlock) {
@@ -130,16 +131,14 @@ const get_Manabit_List = async () => {
            
         }
 
-        const extractedData = events.map(function(obj){
+        console.log(events);
+        const extractedData = events.map(obj =>({
+            blockNumber: obj.blockNumber,
             blockHash: obj.blockHash,
-            address: obj.address,
+            address: obj.returnValues.receiver,
             comment: obj.returnValues.comment
-          }));
-        const jsonData = JSON.stringify(extractedData);
-
-        //console.log('get_Manabit_List: ',inspect(events, false, null, true));
-        return jsonData;
-
+        }));
+        return extractedData;
     } catch (err) {
         console.error(err);
         return null;
@@ -209,7 +208,7 @@ app.post('/get_manabit', async(req,res) => {
 
     if(events !== null){
         console.log('inspect: ',inspect(events, false, null, true));
-        res.json(events[0]);
+        res.json(events);
     } else {
         res.status(500).json({ error: 'server error'});
     }
