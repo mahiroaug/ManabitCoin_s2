@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const e = require('express');
 const { allowedNodeEnvironmentFlags } = require('process');
+const { inspect } = require('util');
 
 const app = express();
 
@@ -99,37 +100,45 @@ const get_Allowance = async () => {
 
 const get_Manabit_List = async () => {
     try {
-        const events = await Gacha.getPastEvents(
-            'Manabit',
-            {
-                fromtBlock: 0,
-                toBlock: 'latest'
-            }
-        );
 
-        /*
-        const manabitList = document.getElementById('manabit-list');
-        manabitList.innerHTML = `
-            <tr>
-                <th>From</th>
-                <th>To</th>
-                <th>Amount</th>
-                <th>Comment</th>
-            </tr>
-        `;
+        const createdBlock = 9096880; // The block number created Gacha-Contract
+        const latestBlock = await web3.eth.getBlockNumber(); // The latest block number
+        const last1day = 8192;
+        const lastdaysBlock = latestBlock - last1day*7;
+        const blockRange = 100000;
+        let fromBlock = lastdaysBlock;
+        let toBlock = (fromBlock + blockRange) > latestBlock ? latestBlock : fromBlock + blockRange;
+        let events = [];
+        let event;
 
-        events.forEach((event) => {
-            const { sender, receiver, amount, comment } = event.returnValues;
-            const newRow = manabitList.insertRow(-1);
-            newRow.insertCell(0).innerText = sender;
-            newRow.insertCell(1).innerText = receiver;
-            newRow.insertCell(2).innerText = wev3.utils.fromWei(amount, 'ether');
-            newRow.insertCell(3).innerText = comment;
-        });
-        */
-        console.log('get_Manabit_List: ',events);
-        return events;
+        while (true) {
+            event = await Gacha.getPastEvents(
+                'Manabit',
+                {
+                    fromBlock: fromBlock,
+                    toBlock: toBlock
+                }
+            );
 
+            console.log(event);
+            events = events.concat(event);
+
+            if (toBlock >= latestBlock) {
+                break;
+                }
+            fromBlock = toBlock + 1;
+            toBlock = (fromBlock + blockRange) > latestBlock ? latestBlock : fromBlock + blockRange;
+           
+        }
+
+        console.log(events);
+        const extractedData = events.map(obj =>({
+            blockNumber: obj.blockNumber,
+            blockHash: obj.blockHash,
+            address: obj.returnValues.receiver,
+            comment: obj.returnValues.comment
+        }));
+        return extractedData;
     } catch (err) {
         console.error(err);
         return null;
@@ -183,7 +192,6 @@ app.post('/get_allowance', async(req,res) => {
         const allow01 = result.allowance01;
         const allow02 = result.allowance02;
 
-
         console.log("inspect: ",addr01,allow01,mnbc01,eth01,addr02,allow02,mnbc02,eth02);
         // responce to client
         res.json({addr01,allow01,mnbc01,eth01,addr02,allow02,mnbc02,eth02});
@@ -196,8 +204,14 @@ app.post('/get_allowance', async(req,res) => {
 
 app.post('/get_manabit', async(req,res) => {
     console.log('call POST[get_manabit]');
-    const { allowance01, allowance02 } = await get_Manabit_List();
-    console.log('result: ',result);
+    const events = await get_Manabit_List();
+
+    if(events !== null){
+        console.log('inspect: ',inspect(events, false, null, true));
+        res.json(events);
+    } else {
+        res.status(500).json({ error: 'server error'});
+    }
 
 });
 

@@ -7,6 +7,7 @@
         <!---load stylesheet-->
         <!--link rel="stylesheet" herf="css/style.css"-->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/spcss@0.9.0">
+        <script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
     </head>
 
     <body>
@@ -77,6 +78,10 @@
             #allowance-list td {
                 font-size: 10px;
             }
+            #manabit-list td {
+                font-family:'Courier New', Courier, monospace;
+                font-size:xx-small;
+            }
         </style>
 
 
@@ -120,12 +125,13 @@
         </form>
 
         <!--display-->
+
         <table id="manabit-list">
         <thead>
         <tr>
-            <th>Sender</th>
-            <th>Receiver</th>
-            <th>Amount</th>
+            <th>blockNumber</th>
+            <!--th>blockHash</th-->
+            <th>receiver</th>
             <th>Comment</th>
         </tr>
         </thead>
