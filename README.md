@@ -187,3 +187,31 @@ allocate secret.key file at `lib/fireblocks_secret.key`
 - lib(directory) -> code source
 - index.js -> code source
 
+
+
+
+# ------Express Application ------
+
+
+### change directory
+
+`cd express`
+
+#### make .env
+
+```
+INFURA_PROJECT_ID=<YOUR_INFURA_PROJECT_ID>
+
+MNBC_COIN_CA=0xEA0B5756e381897cB50479fF9D3C2575C8A04d91
+MNBC_GACHA_CA=0x1709FF281d5a75F1145B82825f4B1Fa8e8Aa3e06
+
+OWNER_ADDRESS=0xB773051791Fc2D87C078B61d8DF1a6809A08C65F
+FIREBLOCKS_VAULT_ACCOUNT_ADDRESS=0x7DaC7d261F50DF2b4b496bD859D1B1dcE5987b65
+```
+
+#### docker build
+
+```
+docker build -t express-app01 . 
+docker run --env-file .env -p 3000:3000 express-app01
+```
