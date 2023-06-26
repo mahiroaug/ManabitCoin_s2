@@ -104,7 +104,7 @@ const get_Manabit_List = async () => {
         const createdBlock = 9096880; // The block number created Gacha-Contract
         const latestBlock = await web3.eth.getBlockNumber(); // The latest block number
         const last1day = 8192;
-        const lastdaysBlock = latestBlock - last1day*7;
+        const lastdaysBlock = latestBlock - last1day*3;
         const blockRange = 100000;
         let fromBlock = lastdaysBlock;
         let toBlock = (fromBlock + blockRange) > latestBlock ? latestBlock : fromBlock + blockRange;
