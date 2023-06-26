@@ -215,3 +215,5 @@ FIREBLOCKS_VAULT_ACCOUNT_ADDRESS=0x7DaC7d261F50DF2b4b496bD859D1B1dcE5987b65
 docker build -t express-app01 . 
 docker run --env-file .env -p 3000:3000 express-app01
 ```
+
+http://localhost:3000
