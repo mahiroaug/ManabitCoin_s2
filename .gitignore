@@ -151,3 +151,4 @@ lambda_func.zip
 
 # fireblocks secret key
 *.key
+webhook*.pub

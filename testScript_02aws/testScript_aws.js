@@ -21,7 +21,7 @@ async function main() {
 
 
         console.log("---step2--------approveGacha(1000)------------");
-        await manabitCC.approveGacha(500);
+        await manabitCC.approveGacha(1000);
 
         console.log("---step2b-------getAllowance(GACHA_CA)--------");
         await manabitCC.getAllowance(GACHA_CA);
