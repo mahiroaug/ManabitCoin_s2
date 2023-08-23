@@ -58,11 +58,27 @@ async function _createTransaction(assetId, amount, srcId, destId){
     console.log(JSON.stringify(result, null, 2));
 }
 
+async function _createMultipleVaultAccounts(prefix,count){
+    for (let i = 1; i <= count; i++) {
+        const accountNumber = i.toString().padStart(2, '0'); // Format the number to "01", "02", ..., "99"
+        const accountName = `${prefix}${accountNumber}`;
+        
+        const { vault, vaultWallet } = await _createVaultAccounts("MATIC_POLYGON_MUMBAI", accountName);
+        
+        // Use the vault and vaultWallet objects as needed
+        
+        console.log(`Created vault account for ${accountName}`);
+    }
+}
+
+
 
 (async () => {
 
+    /*
     // 1 create wallet & create MATIC address
-    const {vault, vaultWallet} = await _createVaultAccounts("MATIC_POLYGON_MUMBAI","test12");
+    /const {vault, vaultWallet} = await _createVaultAccounts("MATIC_POLYGON_MUMBAI","test01");
+
 
     // 2 GET balance MATIC from Vault Asset
     await _getVaultAccountAsset(vault.vaultID,"MATIC_POLYGON_MUMBAI");
@@ -71,6 +87,11 @@ async function _createTransaction(assetId, amount, srcId, destId){
 
     // 3 Transfer
     await _createTransaction("MATIC_POLYGON_MUMBAI", "0.001", "8", "0");
+    */
+
+    // 大量生産
+    await _createMultipleVaultAccounts("test",10)
+
 
     
 })().catch((e)=>{
