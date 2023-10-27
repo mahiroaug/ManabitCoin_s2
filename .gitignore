@@ -135,6 +135,7 @@ dist
 # End of https://www.toptal.com/developers/gitignore/api/solidity
 node_modules
 .env
+.env_express
 coverage
 coverage.json
 typechain

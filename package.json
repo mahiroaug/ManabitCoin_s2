@@ -22,6 +22,7 @@
   "dependencies": {
     "@aws/web3-http-provider": "^1.0.1",
     "@fireblocks/fireblocks-web3-provider": "^1.2.3",
+    "@fireblocks/hardhat-fireblocks": "^1.2.2",
     "@openzeppelin/contracts": "^4.9.0",
     "aws-sdk": "^2.1388.0",
     "axios": "^1.4.0",

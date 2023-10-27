@@ -252,7 +252,7 @@ async function getManabitList(){
     await getAllowance(signer_addressFB,GACHA_CA);
 
     // approveGacha
-    await approveGacha(signer_addressFB,1000)
+    await approveGacha(signer_addressFB,5000)
 
     // get Allowance
     await getAllowance(signer_addressFB,GACHA_CA);
