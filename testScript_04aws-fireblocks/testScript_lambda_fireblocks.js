@@ -14,9 +14,6 @@ const path = require('path');
 const { inspect } = require('util');
 const Web3 = require("web3");
 const { FireblocksWeb3Provider, ChainId } = require("@fireblocks/fireblocks-web3-provider")
-// const AWSHttpProvider = require('@aws/web3-http-provider');
-
-// const AWSHttpProvider = require('@fireblocks/fireblocks-web3-provider');
 
 const { toASCII } = require('punycode');
 
@@ -44,16 +41,6 @@ let myAddrFB;
 let signer_addressFB;
 let CoinFB;
 let GachaFB;
-
-//-------------------削除予定------------------------
-// let CoinAWS;
-// let GachaAWS;
-
-//-------------------削除予定------------------------
-//// AMB
-// const amb_endpoint = process.env.AMB_HTTP_ENDPOINT;
-
-
 
 
 
@@ -104,29 +91,6 @@ const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
     const estimateMaxTxFeeETH = await web3FB.utils.fromWei(estimateMaxTxFee.toString(), 'ether');
     console.log(' estimate MAX Tx Fee:', estimateMaxTxFee, '(', estimateMaxTxFeeETH, 'ETH)');
 
-//---------------------------削除予定----------------------------------------
-/*
-    // Sign Tx
-    const createTransaction = await web3FB.eth.signTransaction(
-        {
-            to: toAddress,
-            from: _signer,
-            data: _tx.encodeABI(),
-            gas: await web3FB.utils.toHex(setGasLimit)
-        }
-    );
-
-    // Send Tx and Wait for Receipt
-    const createReceipt = await web3aws.eth
-        .sendSignedTransaction(createTransaction.rawTransaction)
-        .once("transactionHash", (txhash) => {
-            console.log(` Send transaction ...`);
-            console.log(` https://${network}.etherscan.io/tx/${txhash}`);
-
-        })
-    console.log(` Tx successful with hash: ${createReceipt.transactionHash} in block ${createReceipt.blockNumber}`);
-*/
-
 
     const createReceipt = await web3FB.eth.sendTransaction({
         to: toAddress,
@@ -174,62 +138,6 @@ async function sendManabit(signerAddr, to, amount, comment){
 }
 
 
-//-----------------------------------getManabitListはReact化予定-------------------------------
-// async function getManabitList(){
-//     try{
-
-//         const createdBlock = 9096880; // The block number created Gacha-Contract
-//         const latestBlock = await web3FB.eth.getBlockNumber(); // The latest block number
-//         const last1day = 8192;
-//         const last1dayBlock = latestBlock - last1day;
-//         const blockRange = 1000;
-//         let fromBlock = last1dayBlock;
-//         let toBlock = (fromBlock + blockRange) > latestBlock ? latestBlock : fromBlock + blockRange;
-//         let events = [];
-
-//         while (true) {
-//             const event = await GachaFB.getPastEvents(
-//                 'Manabit',
-//                 {
-//                     fromBlock: fromBlock,
-//                     toBlock: toBlock
-//                 }
-//             ).then(console.log);
-
-//             events = events.concat(event);
-
-//             if (toBlock >= latestBlock) {
-//                 break;
-//                 }
-//             fromBlock = toBlock + 1;
-//             toBlock = (fromBlock + blockRange) > latestBlock ? latestBlock : fromBlock + blockRange;
-           
-//         }
-//         console.log('get_Manabit_List inspect: ',inspect(events, false, null, true));
-
-
-/*
-        const events2 = await CoinFB.getPastEvents(
-            'allEvents',
-            {
-                fromBlock: 1,
-                toBlock: 'latest'
-            }
-        ).then(console.log);
-        console.log('get_Coin inspect: ',inspect(events2, false, null, true));
-*/
-
-//         return events;
-
-//     } catch (err) {
-//         console.error(err);
-//         return null;
-//     }
-// }
-
-
-
-
 
 (async() => {
   
@@ -239,17 +147,9 @@ async function sendManabit(signerAddr, to, amount, comment){
     CoinFB = new web3FB.eth.Contract(COIN_ABI, COIN_CA);
     GachaFB = new web3FB.eth.Contract(GACHA_ABI, GACHA_CA);
 
-    //---------------------削除予定------------------------------------------
-    // initializer on AMB ////////////////////////////////////////////
-    // web3aws = new Web3(new AWSHttpProvider(amb_endpoint));
-    // web3aws.eth.getNodeInfo().then(console.log);
-    // CoinAWS = new web3aws.eth.Contract(COIN_ABI, COIN_CA);
-    // GachaAWS = new web3aws.eth.Contract(GACHA_ABI, GACHA_CA);
-
     // get Account Balance
     const test_addr = process.env.MY_TEST_ADDRESS;
     await getAccountBalance(test_addr);
-    
 
     // get Fireblocks vault accounts
     myAddrFB = await web3FB.eth.getAccounts();
@@ -276,10 +176,6 @@ async function sendManabit(signerAddr, to, amount, comment){
 
     // get Balance
     await getAccountBalance(signer_addressFB);
-
-    //-----------削除予定-----------------------
-    // get ManabitList
-    //await getManabitList();
 
 
 
