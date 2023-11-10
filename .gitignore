@@ -82,6 +82,7 @@ web_modules/
 .env.test.local
 .env.production.local
 .env.local
+.env.holesky
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -153,3 +154,6 @@ lambda_func.zip
 # fireblocks secret key
 *.key
 webhook*.pub
+
+# fireblocks CSR
+*.csr
