@@ -7,7 +7,7 @@ require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 // require('dotenv').config({ path: '.env'});
 require('dotenv').config({ path: '.env.holesky'});
 
-require('dotenv').config({ path: 'ca.env'});
+require('dotenv').config({ path: 'ca.env.holesky'});
 
 const fs = require('fs');
 const path = require('path');
