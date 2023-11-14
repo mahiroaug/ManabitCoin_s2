@@ -4,7 +4,7 @@
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 
 
-require('dotenv').config({ path: '.env'});
+require('dotenv').config({ path: '.env.holesky'});
 require('dotenv').config({ path: 'ca.env'});
 
 const fs = require('fs');
@@ -23,7 +23,7 @@ const COIN_ABI = require('../artifacts/contracts/ManabitCoin.sol/ManabitCoin.jso
 const GACHA_ABI = require('../artifacts/contracts/ManabitGacha.sol/ManabitGacha.json').abi;
 
 //// fireblocks
-const fb_apiSecret = fs.readFileSync(path.resolve("fireblocks_secret.key"), "utf8");
+const fb_apiSecret = fs.readFileSync(path.resolve("fireblocks_secret_holesky.key"), "utf8");
 const fb_apiKey = process.env.FIREBLOCKS_API_KEY
 const fb_vaultId = process.env.FIREBLOCKS_VAULT_ACCOUNT_ID
 
@@ -65,8 +65,12 @@ async function getAccountBalance(address) {
 
 async function getAllowance(signer_address,spender_address){
     try{
+        console.log('getAllowance(signer_address, spender_address): ',signer_address,' ',spender_address);
         const allowance = await CoinFB.methods.allowance(signer_address,spender_address).call();
+        console.log('allowance: ',allowance);
         const mnbcAllowance = web3FB.utils.fromWei(allowance.toString(),"ether");
+        console.log('Allowance.toString(): ',allowance.toString());       
+        
         console.log('Allowance: ',mnbcAllowance);
 
     } catch(error){
@@ -256,7 +260,7 @@ async function getManabitList(){
     await getAllowance(signer_addressFB,GACHA_CA);
 
     // approveGacha
-    await approveGacha(signer_addressFB,5000)
+    await approveGacha(signer_addressFB,10)
 
     // get Allowance
     await getAllowance(signer_addressFB,GACHA_CA);
