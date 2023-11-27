@@ -1,5 +1,5 @@
-require('dotenv').config({ path: '.env_localhost'});
-require('dotenv').config({ path: 'ca.env_localhost'});
+require('dotenv').config({ path: '.env.holesky'});
+require('dotenv').config({ path: 'ca.env.holesky'});
 
 const hardhat = require('hardhat');
 const path = require('path');

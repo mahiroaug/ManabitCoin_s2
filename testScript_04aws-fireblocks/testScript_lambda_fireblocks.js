@@ -36,7 +36,9 @@ const eip1193Provider = new FireblocksWeb3Provider({
     privateKey: fb_apiSecret,
     apiKey: fb_apiKey,
     vaultAccountIds: fb_vaultId,
-    chainId: ChainId.GOERLI,
+    //ここを変える（FB対応してから？）
+    // chainId: ChainId.GOERLI,
+    chainId:17000
 });
 
 let web3FB;
@@ -63,8 +65,8 @@ async function getAccountBalance(address) {
 
 async function getAllowance(signer_address,spender_address){
     try{
-        //ここがなぜ5000or0なのか？？？----------------------------------------
-        //現状のAllowanceを取得する
+        //Q.ここがなぜ5000or0なのか？？？----------------------------------------
+        //A.現状のAllowanceを取得するから
         const allowance = await CoinFB.methods.allowance(signer_address,spender_address).call();
         const mnbcAllowance = web3FB.utils.fromWei(allowance.toString(),"ether");
         console.log('Allowance: ',mnbcAllowance);
@@ -168,7 +170,7 @@ async function sendManabit(signerAddr, to, amount, comment){
     await getAllowance(signer_addressFB,GACHA_CA);
 
     // approveGacha
-    await approveGacha(signer_addressFB,5000)
+    await approveGacha(signer_addressFB,5)
 
     // get Allowance
     await getAllowance(signer_addressFB,GACHA_CA);

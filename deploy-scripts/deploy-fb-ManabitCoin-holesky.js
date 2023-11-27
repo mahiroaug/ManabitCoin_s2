@@ -11,9 +11,9 @@ const privateKey = process.env.OWNER_PRIVATE_KEY;
 const account = web3.eth.accounts.privateKeyToAccount(privateKey);
 
 async function main() {
-  const name = "UedaCoin";
-  const symbol = "UDC";
-  const initialSupply = web3.utils.toWei("20");
+  const name = "ManabitCoin";
+  const symbol = "MNBC";
+  const initialSupply = web3.utils.toWei("1000000");
   const tx = contract.deploy({ data: myERC20.bytecode, arguments: [name, symbol, initialSupply, account.address] });
   const gas = await tx.estimateGas()*3;
   const gasPrice = await web3.eth.getGasPrice();
