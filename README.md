@@ -11,6 +11,7 @@ npx hardhat compile
 ```shell
 npx hardhat node
 ```
+After that, open new tab and enter deploying command below.
 
 .env_localhost
 
@@ -36,7 +37,7 @@ MNBC_GACHA_CA=
 ```
 ### deploy ManabitGacha
 ```shell
-npx hardhat run scripts/deploy-ManabitGacha.js --network localhost
+npx hardhat run deploy-scripts/deploy-ManabitGacha.js --network localhost
 ```
 
 ### update ca.env_localhost
@@ -188,6 +189,58 @@ allocate secret.key file at `lib/fireblocks_secret.key`
 - index.js -> code source
 
 
+
+# ------Holesky Network with Fireblocks------
+
+hardhat.config.js is the config file of hardhat & fireblocks.
+Pls arrange if you renewal network.
+
+
+### .env
+```
+FIREBLOCKS_API_KEY=
+FIREBLOCKS_URL=https://api.fireblocks.io
+FIREBLOCKS_VAULT_ACCOUNT_ID=
+FIREBLOCKS_VAULT_ACCOUNT_NAME=
+FIREBLOCKS_ASSET_ID_ETH=
+FIREBLOCKS_ASSET_ID_MNBC=
+FIREBLOCKS_GACHA_NAME=
+```
+
+allocate secret.key file on project root directory
+
+`fireblocks_secret_holesky.key`
+
+
+#### test Script
+```
+node testScript_04aws-fireblocks/testScript_lambda_fireblocks.js
+```
+
+### AWS Lambda Function
+
+cd aws-lambda-layer03_fireblocks_holesky
+
+#### deploy lambda
+
+- nodejs_layer.zip -> layer
+- lib(directory) -> code source
+- index.js -> code source
+
+#### SectretManager
+Pls allocate these info in SecretManager
+```
+NETWORK=
+MNBC_COIN_CA=
+MNBC_GACHA_CA=
+FIREBLOCKS_API_KEY=
+FIREBLOCKS_VAULT_ACCOUNT_ID=
+```
+
+And also allocate secret.key file in SecretsManager<br>
+To allocate it, we have to use AWS-CLI.
+
+More, to read SecretManager from Lambda, you need permission settings:)<br>
 
 
 # ------Express Application ------

@@ -4,15 +4,17 @@
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 
 
+// require('dotenv').config({ path: '.env'});
 require('dotenv').config({ path: '.env.holesky'});
-require('dotenv').config({ path: 'ca.env'});
+
+require('dotenv').config({ path: 'ca.env.holesky'});
 
 const fs = require('fs');
 const path = require('path');
 const { inspect } = require('util');
 const Web3 = require("web3");
-const { FireblocksWeb3Provider, ChainId } = require("@fireblocks/fireblocks-web3-provider")
-const AWSHttpProvider = require('@aws/web3-http-provider');
+const { FireblocksWeb3Provider, ChainId } = require("@fireblocks/fireblocks-web3-provider");
+
 const { toASCII } = require('punycode');
 
 //// common environment
@@ -23,6 +25,9 @@ const COIN_ABI = require('../artifacts/contracts/ManabitCoin.sol/ManabitCoin.jso
 const GACHA_ABI = require('../artifacts/contracts/ManabitGacha.sol/ManabitGacha.json').abi;
 
 //// fireblocks
+//goerli
+// const fb_apiSecret = fs.readFileSync(path.resolve("fireblocks_secret.key"), "utf8");
+//holesky
 const fb_apiSecret = fs.readFileSync(path.resolve("fireblocks_secret_holesky.key"), "utf8");
 const fb_apiKey = process.env.FIREBLOCKS_API_KEY
 const fb_vaultId = process.env.FIREBLOCKS_VAULT_ACCOUNT_ID
@@ -31,7 +36,9 @@ const eip1193Provider = new FireblocksWeb3Provider({
     privateKey: fb_apiSecret,
     apiKey: fb_apiKey,
     vaultAccountIds: fb_vaultId,
-    chainId: ChainId.GOERLI,
+    //ここを変える（FB対応してから？）
+    // chainId: ChainId.GOERLI,
+    chainId:17000
 });
 
 let web3FB;
@@ -39,13 +46,6 @@ let myAddrFB;
 let signer_addressFB;
 let CoinFB;
 let GachaFB;
-let CoinAWS;
-let GachaAWS;
-
-//// AMB
-const amb_endpoint = process.env.AMB_HTTP_ENDPOINT;
-
-
 
 
 
@@ -65,12 +65,10 @@ async function getAccountBalance(address) {
 
 async function getAllowance(signer_address,spender_address){
     try{
-        console.log('getAllowance(signer_address, spender_address): ',signer_address,' ',spender_address);
+        //Q.ここがなぜ5000or0なのか？？？----------------------------------------
+        //A.現状のAllowanceを取得するから
         const allowance = await CoinFB.methods.allowance(signer_address,spender_address).call();
-        console.log('allowance: ',allowance);
         const mnbcAllowance = web3FB.utils.fromWei(allowance.toString(),"ether");
-        console.log('Allowance.toString(): ',allowance.toString());       
-        
         console.log('Allowance: ',mnbcAllowance);
 
     } catch(error){
@@ -83,7 +81,7 @@ async function getAllowance(signer_address,spender_address){
 const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
 
     // check toAddress
-    toAddress = web3aws.utils.toChecksumAddress(_to);
+    toAddress = web3FB.utils.toChecksumAddress(_to);
     console.log(' toAddress:',toAddress);
 
     // gasLimit
@@ -91,37 +89,14 @@ const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
     console.log(' setGasLimit:', setGasLimit);
 
     // gasPrice
-    const gasPrice = await web3aws.eth.getGasPrice();
-    const gasPriceInGwei = await web3aws.utils.fromWei(gasPrice, 'gwei');
+    const gasPrice = await web3FB.eth.getGasPrice();
+    const gasPriceInGwei = await web3FB.utils.fromWei(gasPrice, 'gwei');
     console.log(' gasPrice:', gasPrice,'(', gasPriceInGwei,'Gwei)');
 
     // estimate max Transaction Fee
     const estimateMaxTxFee = setGasLimit * gasPrice;
-    const estimateMaxTxFeeETH = await web3aws.utils.fromWei(estimateMaxTxFee.toString(), 'ether');
+    const estimateMaxTxFeeETH = await web3FB.utils.fromWei(estimateMaxTxFee.toString(), 'ether');
     console.log(' estimate MAX Tx Fee:', estimateMaxTxFee, '(', estimateMaxTxFeeETH, 'ETH)');
-
-//---------------------------削除予定----------------------------------------
-/*
-    // Sign Tx
-    const createTransaction = await web3FB.eth.signTransaction(
-        {
-            to: toAddress,
-            from: _signer,
-            data: _tx.encodeABI(),
-            gas: await web3FB.utils.toHex(setGasLimit)
-        }
-    );
-
-    // Send Tx and Wait for Receipt
-    const createReceipt = await web3aws.eth
-        .sendSignedTransaction(createTransaction.rawTransaction)
-        .once("transactionHash", (txhash) => {
-            console.log(` Send transaction ...`);
-            console.log(` https://${network}.etherscan.io/tx/${txhash}`);
-
-        })
-    console.log(` Tx successful with hash: ${createReceipt.transactionHash} in block ${createReceipt.blockNumber}`);
-*/
 
 
     const createReceipt = await web3FB.eth.sendTransaction({
@@ -144,7 +119,7 @@ const sendTx = async (_to ,_tx ,_signer,_gasLimit) => {
 // Gachaコントラクトに対して必要量のMNBCトークン使用許可を与える
 async function approveGacha(signerAddr,amount){
     try{
-        const weiAmount = await web3aws.utils.toWei(amount.toString(),"ether");
+        const weiAmount = await web3FB.utils.toWei(amount.toString(),"ether");
         const tx = await CoinFB.methods.approve(GACHA_CA, weiAmount);
         const receipt = await sendTx(COIN_CA,tx,signerAddr,150000);
 
@@ -158,7 +133,7 @@ async function approveGacha(signerAddr,amount){
 // まなびっと送信
 async function sendManabit(signerAddr, to, amount, comment){
     try{
-        const weiAmount = web3aws.utils.toWei(amount.toString(),"ether");
+        const weiAmount = web3FB.utils.toWei(amount.toString(),"ether");
         const tx = GachaFB.methods.sendManabitCoin(comment, to, weiAmount);
         const receipt = await sendTx(GACHA_CA,tx,signerAddr,300000);
 
@@ -170,83 +145,18 @@ async function sendManabit(signerAddr, to, amount, comment){
 }
 
 
-//-----------------------------------getManabitListはReact化予定-------------------------------
-async function getManabitList(){
-    try{
-
-        const createdBlock = 9096880; // The block number created Gacha-Contract
-        const latestBlock = await web3FB.eth.getBlockNumber(); // The latest block number
-        const last1day = 8192;
-        const last1dayBlock = latestBlock - last1day;
-        const blockRange = 1000;
-        let fromBlock = last1dayBlock;
-        let toBlock = (fromBlock + blockRange) > latestBlock ? latestBlock : fromBlock + blockRange;
-        let events = [];
-
-        while (true) {
-            const event = await GachaFB.getPastEvents(
-                'Manabit',
-                {
-                    fromBlock: fromBlock,
-                    toBlock: toBlock
-                }
-            ).then(console.log);
-
-            events = events.concat(event);
-
-            if (toBlock >= latestBlock) {
-                break;
-                }
-            fromBlock = toBlock + 1;
-            toBlock = (fromBlock + blockRange) > latestBlock ? latestBlock : fromBlock + blockRange;
-           
-        }
-        console.log('get_Manabit_List inspect: ',inspect(events, false, null, true));
-
-
-/*
-        const events2 = await CoinFB.getPastEvents(
-            'allEvents',
-            {
-                fromBlock: 1,
-                toBlock: 'latest'
-            }
-        ).then(console.log);
-        console.log('get_Coin inspect: ',inspect(events2, false, null, true));
-*/
-
-        return events;
-
-    } catch (err) {
-        console.error(err);
-        return null;
-    }
-}
-
-
-
-
 
 (async() => {
   
     // initializer on fireblocks ////////////////////////////////////////////
     web3FB = new Web3(eip1193Provider);
-    myAddrFB = web3FB.eth.getAccounts()
+    myAddrFB = web3FB.eth.getAccounts();
     CoinFB = new web3FB.eth.Contract(COIN_ABI, COIN_CA);
     GachaFB = new web3FB.eth.Contract(GACHA_ABI, GACHA_CA);
-
-
-    // initializer on AMB ////////////////////////////////////////////
-    web3aws = new Web3(new AWSHttpProvider(amb_endpoint));
-    // web3aws.eth.getNodeInfo().then(console.log);
-    // CoinAWS = new web3aws.eth.Contract(COIN_ABI, COIN_CA);
-    // GachaAWS = new web3aws.eth.Contract(GACHA_ABI, GACHA_CA);
-
 
     // get Account Balance
     const test_addr = process.env.MY_TEST_ADDRESS;
     await getAccountBalance(test_addr);
-    
 
     // get Fireblocks vault accounts
     myAddrFB = await web3FB.eth.getAccounts();
@@ -260,7 +170,7 @@ async function getManabitList(){
     await getAllowance(signer_addressFB,GACHA_CA);
 
     // approveGacha
-    await approveGacha(signer_addressFB,10)
+    await approveGacha(signer_addressFB,5)
 
     // get Allowance
     await getAllowance(signer_addressFB,GACHA_CA);
@@ -273,10 +183,6 @@ async function getManabitList(){
 
     // get Balance
     await getAccountBalance(signer_addressFB);
-
-
-    // get ManabitList
-    //await getManabitList();
 
 
 
