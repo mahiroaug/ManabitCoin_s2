@@ -13,7 +13,7 @@ const fs = require('fs');
 const path = require('path');
 const { inspect } = require('util');
 const Web3 = require("web3");
-const { FireblocksWeb3Provider, ChainId } = require("@fireblocks/fireblocks-web3-provider")
+const { FireblocksWeb3Provider, ChainId } = require("@fireblocks/fireblocks-web3-provider");
 
 const { toASCII } = require('punycode');
 
@@ -150,7 +150,7 @@ async function sendManabit(signerAddr, to, amount, comment){
   
     // initializer on fireblocks ////////////////////////////////////////////
     web3FB = new Web3(eip1193Provider);
-    myAddrFB = web3FB.eth.getAccounts()
+    myAddrFB = web3FB.eth.getAccounts();
     CoinFB = new web3FB.eth.Contract(COIN_ABI, COIN_CA);
     GachaFB = new web3FB.eth.Contract(GACHA_ABI, GACHA_CA);
 
