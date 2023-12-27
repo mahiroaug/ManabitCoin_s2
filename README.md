@@ -223,13 +223,24 @@ cd aws-lambda-layer03_fireblocks_holesky
 
 #### deploy lambda
 
-allocate secret.key file in SecretsManager<br>
-To allocate it, we have to use AWS-CLI.
-
 - nodejs_layer.zip -> layer
 - lib(directory) -> code source
 - index.js -> code source
 
+#### SectretManager
+Pls allocate these info in SecretManager
+```
+NETWORK=
+MNBC_COIN_CA=
+MNBC_GACHA_CA=
+FIREBLOCKS_API_KEY=
+FIREBLOCKS_VAULT_ACCOUNT_ID=
+```
+
+And also allocate secret.key file in SecretsManager<br>
+To allocate it, we have to use AWS-CLI.
+
+More, to read SecretManager from Lambda, you need permission settings:)<br>
 
 
 # ------Express Application ------
